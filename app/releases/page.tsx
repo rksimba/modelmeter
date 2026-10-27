@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { models } from "@/data/models";
 import { formatMonth, formatRelease, releaseSortValue } from "@/lib/format";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Releases",
   description: "Reverse-chronological AI model releases, each linked to the provider announcement.",
-};
+  path: "/releases",
+});
 
 export const ensureStatic = "navigation";
 

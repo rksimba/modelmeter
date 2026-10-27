@@ -2,6 +2,19 @@ import type { Model } from "@/data/models";
 
 export const DAYS_PER_MONTH = 30;
 
+/** Starting values on the calculator form. Comparison pages reuse this workload. */
+export const CALCULATOR_DEFAULTS = {
+  inputTokens: 2_000,
+  outputTokens: 800,
+  requestsPerDay: 1_000,
+} as const;
+
+export const SAMPLE_WORKLOAD: Workload = {
+  inputTokens: CALCULATOR_DEFAULTS.inputTokens,
+  outputTokens: CALCULATOR_DEFAULTS.outputTokens,
+  requestsPerMonth: CALCULATOR_DEFAULTS.requestsPerDay * DAYS_PER_MONTH,
+};
+
 export type Workload = {
   inputTokens: number;
   outputTokens: number;

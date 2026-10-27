@@ -64,6 +64,17 @@ export function formatUsd(value: number): string {
   });
 }
 
+/** Per-request estimates can sit between one cent and a dollar. Keep enough digits to tell them apart. */
+export function formatUsdExact(value: number): string {
+  if (!Number.isFinite(value)) return "n/a";
+  const abs = Math.abs(value);
+  const maximumFractionDigits = abs >= 1 ? 2 : abs >= 0.01 ? 4 : 6;
+  return `$${value.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits,
+  })}`;
+}
+
 export function formatTokens(value: number | null): string {
   if (value === null) return "n/a";
   if (value % 1000 === 0) {

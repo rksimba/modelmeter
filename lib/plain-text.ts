@@ -1,7 +1,10 @@
 import { DATASET_CHECKED_ON, models } from "@/data/models";
-import { formatModalities, formatRate, formatRelease, formatTokens } from "@/lib/format";
+import { comparisonPairs, sameTierRuleSentence } from "@/lib/comparisons";
+import { formatModalities, formatRate, formatRelease, formatTokens, formatUsd, formatUsdExact } from "@/lib/format";
+import { SAMPLE_WORKLOAD, estimateCost } from "@/lib/pricing";
+import { indexablePaths } from "@/lib/routes";
+import { absoluteUrl } from "@/lib/metadata";
 import { methodologyParagraphs, siteConfig } from "@/lib/site";
-import { getSiteUrl } from "@/lib/site-url";
 
 function rowLine(model: (typeof models)[number]): string {
   const cached =
@@ -22,7 +25,6 @@ function rowLine(model: (typeof models)[number]): string {
 }
 
 export function llmsTxt(): string {
-  const origin = getSiteUrl();
   return [
     `# ${siteConfig.name}`,
     "",
@@ -31,14 +33,16 @@ export function llmsTxt(): string {
     "## Methodology",
     ...methodologyParagraphs.map((paragraph) => paragraph),
     "",
+    "## Pages",
+    ...indexablePaths()
+      .filter((entry) => !entry.path.startsWith("/models/"))
+      .map((entry) => `- ${entry.title}: ${absoluteUrl(entry.path)} — ${entry.summary}`),
+    "",
     "## Dataset",
     `Checked: ${DATASET_CHECKED_ON}`,
     `Models: ${models.length}`,
-    `JSON: ${origin}/api/models.json`,
-    `Full text: ${origin}/llms-full.txt`,
-    `Comparison: ${origin}/`,
-    `Calculator: ${origin}/calculator`,
-    `Releases: ${origin}/releases`,
+    `JSON: ${absoluteUrl("/api/models.json")}`,
+    `Full text: ${absoluteUrl("/llms-full.txt")}`,
     "",
     "## Models",
     ...models.map(
@@ -52,7 +56,6 @@ export function llmsTxt(): string {
 }
 
 export function llmsFullTxt(): string {
-  const origin = getSiteUrl();
   const blocks = models.map((model) =>
     [
       `## ${model.provider} — ${model.name}`,
@@ -61,7 +64,7 @@ export function llmsFullTxt(): string {
       model.limitsSourceUrl ? `Limits source: ${model.limitsSourceUrl}` : null,
       model.releaseSourceUrl ? `Release source: ${model.releaseSourceUrl}` : null,
       `Note: ${model.notes}`,
-      `Page: ${origin}/models/${model.slug}`,
+      `Page: ${absoluteUrl(`/models/${model.slug}`)}`,
     ]
       .filter(Boolean)
       .join("\n"),
@@ -74,6 +77,30 @@ export function llmsFullTxt(): string {
     ...methodologyParagraphs,
     "",
     "Rates are USD per 1 million tokens. n/a means the official page did not publish that value.",
+    "",
+    "## Pages",
+    ...indexablePaths().map(
+      (entry) => `- ${entry.title}: ${absoluteUrl(entry.path)} — ${entry.summary}`,
+    ),
+    "",
+    "## Same-tier comparisons",
+    sameTierRuleSentence(),
+    `Sample workload: ${SAMPLE_WORKLOAD.inputTokens} input tokens, ${SAMPLE_WORKLOAD.outputTokens} output tokens, ${SAMPLE_WORKLOAD.requestsPerMonth} requests per month. Costs use the stored input and output rates only.`,
+    ...comparisonPairs().map((pair) => {
+      const costA = estimateCost(pair.a, SAMPLE_WORKLOAD);
+      const costB = estimateCost(pair.b, SAMPLE_WORKLOAD);
+      const costLine =
+        costA && costB
+          ? `${pair.a.name} ${formatUsdExact(costA.perRequest)} per request / ${formatUsd(costA.perMonth)} per month; ${pair.b.name} ${formatUsdExact(costB.perRequest)} per request / ${formatUsd(costB.perMonth)} per month.`
+          : "Sample cost n/a.";
+      return [
+        `### ${pair.a.name} vs ${pair.b.name}`,
+        absoluteUrl(`/compare/${pair.slug}`),
+        `${pair.a.provider} ${pair.a.name}: input ${formatRate(pair.a.inputUsdPerMillion)}, output ${formatRate(pair.a.outputUsdPerMillion)} (${pair.a.priceLabel}). Source: ${pair.a.sourceUrl}`,
+        `${pair.b.provider} ${pair.b.name}: input ${formatRate(pair.b.inputUsdPerMillion)}, output ${formatRate(pair.b.outputUsdPerMillion)} (${pair.b.priceLabel}). Source: ${pair.b.sourceUrl}`,
+        costLine,
+      ].join("\n");
+    }),
     "",
     ...blocks,
     "",

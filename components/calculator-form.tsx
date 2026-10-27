@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import type { Model } from "@/data/models";
 import { formatRate, formatUsd } from "@/lib/format";
-import { DAYS_PER_MONTH, estimateCost, modelIsPriced } from "@/lib/pricing";
+import { CALCULATOR_DEFAULTS, DAYS_PER_MONTH, estimateCost, modelIsPriced } from "@/lib/pricing";
 
 const FALLBACK_SLUG = "claude-sonnet-5-5";
 const COMPARE_ORDER = [
@@ -33,9 +33,9 @@ export function CalculatorForm({ models }: { models: Model[] }) {
     compareOverride && compareOverride.slug === slug
       ? compareOverride.items
       : defaultComparisons(slug, priced);
-  const [inputTokens, setInputTokens] = useState(2_000);
-  const [outputTokens, setOutputTokens] = useState(800);
-  const [requests, setRequests] = useState(1_000);
+  const [inputTokens, setInputTokens] = useState<number>(CALCULATOR_DEFAULTS.inputTokens);
+  const [outputTokens, setOutputTokens] = useState<number>(CALCULATOR_DEFAULTS.outputTokens);
+  const [requests, setRequests] = useState<number>(CALCULATOR_DEFAULTS.requestsPerDay);
   const [period, setPeriod] = useState<"day" | "month">("day");
 
   const selected = models.find((model) => model.slug === slug) ?? priced[0];

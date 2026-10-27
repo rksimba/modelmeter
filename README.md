@@ -50,7 +50,11 @@ npm run build
 
 7. Commit the data change and push. Vercel rebuilds the static pages from the file.
 
-The calculator, `/api/models.json`, `/llms.txt`, and `/llms-full.txt` all read the same file. You do not update them separately.
+The calculator, provider pages, same-tier comparisons, cheapest and context rankings, `/sitemap.xml`, `/api/models.json`, `/llms.txt`, and `/llms-full.txt` all read the same file. You do not update them separately.
+
+`sitemap.xml` sets `lastmod` from each row’s `updatedAt` on model pages, from the latest `updatedAt` among a provider’s rows on provider pages, from the later of the two rows on a comparison, and from `DATASET_CHECKED_ON` on the other pages. Set `NEXT_PUBLIC_SITE_URL` to the public origin (for example `https://modelmeter.live`) so canonical URLs, Open Graph URLs, the sitemap, and `llms.txt` use that host. Without it, a Vercel production build uses `VERCEL_PROJECT_PRODUCTION_URL`.
+
+Comparison URLs are chosen in `lib/comparisons.ts`. A pair is two priced models from different providers whose higher input rate is at most 1.5× the lower one, and the same for output. Closer pairs come first, each model appears in at most two pairs, and the list stops at 12. A price change can add or remove a URL on the next build. The pages that remain show the stored rate label, the source link, and the cost of the calculator’s starting workload (2,000 input tokens, 800 output tokens, 1,000 requests per day, 30-day month). Off-peak and introductory rates stay in the cheapest ranking with their labels. They are not dropped and not replaced with another rate from the note.
 
 ## What a row means
 
@@ -62,14 +66,21 @@ Prices are USD per 1 million tokens. The number is the specific rate named in `p
 
 | Path | What it is |
 | --- | --- |
-| `/` | Sortable, filterable comparison |
-| `/calculator` | Token and request cost estimate, plus three other models |
+| `/` | Sortable, filterable comparison, plus a visible FAQ |
+| `/calculator` | Token and request cost estimate, plus three other models, plus a visible FAQ |
+| `/providers` | One link per company that bills an API in the ledger |
+| `/providers/[provider]` | That provider’s models, stored rates, rate labels, and sources |
+| `/compare` | The same-tier pairs currently produced from the ledger |
+| `/compare/[a]-vs-[b]` | One pair: stored rates, source notes, and a sample workload cost |
+| `/cheapest-ai-api` | Ranked by stored input rate and, separately, by stored output rate |
+| `/largest-context-window-ai-models` | Ranked by the published context window |
 | `/releases` | Reverse-chronological releases with source links |
-| `/models/[slug]` | One model, its rate, limits, source, and updated date |
+| `/models/[slug]` | One model, its rate, limits, source, updated date, and related links |
 | `/about` | Methodology and a newsletter form |
 | `/sponsor` | Placeholder. No packages or terms |
 | `/api/models.json` | Full dataset |
-| `/llms.txt`, `/llms-full.txt` | Plain-text summary for chatbots |
+| `/llms.txt`, `/llms-full.txt` | Plain-text summary for chatbots, including the pages above |
+| `/sitemap.xml` | Those pages, with `lastmod` from the ledger dates |
 | `/api/subscribe` | Stores a newsletter contact in Resend. Sends no email. Returns 501 when `RESEND_API_KEY` or `RESEND_SEGMENT_ID` is missing. |
 
 ## Newsletter and monetisation

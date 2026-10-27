@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Sponsor",
-  description: "Sponsorship information for ModelMeter is coming soon.",
-};
+  description: "Sponsorship information for ModelMeter is coming soon. No packages or prices are listed.",
+  path: "/sponsor",
+});
 
 export const ensureStatic = "navigation";
 

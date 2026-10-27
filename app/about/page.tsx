@@ -3,13 +3,15 @@ import Link from "next/link";
 import { NewsletterForm } from "@/components/newsletter-form";
 import { DATASET_CHECKED_ON } from "@/data/models";
 import { formatIsoDate } from "@/lib/format";
+import { pageMetadata } from "@/lib/metadata";
 import { methodologyParagraphs } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "About",
   description:
     "How ModelMeter collects API prices: official provider pages only, with a source link and updated date on every row.",
-};
+  path: "/about",
+});
 
 export const ensureStatic = "navigation";
 

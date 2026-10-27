@@ -12,6 +12,7 @@ import {
   releaseSortValue,
   statusLabel,
 } from "@/lib/format";
+import { providerSlug } from "@/lib/models";
 
 type SortKey =
   | "provider"
@@ -253,7 +254,14 @@ export function ComparisonTable({ models }: { models: Model[] }) {
                         Source
                       </a>
                     </th>
-                    <td className="px-4 py-4">{model.provider}</td>
+                    <td className="px-4 py-4">
+                      <Link
+                        href={`/providers/${providerSlug(model.provider)}`}
+                        className="transition-colors hover:text-accent"
+                      >
+                        {model.provider}
+                      </Link>
+                    </td>
                     <td className="px-4 py-4">
                       <PriceCell value={model.inputUsdPerMillion} label={model.priceLabel} />
                     </td>
@@ -281,7 +289,9 @@ export function ComparisonTable({ models }: { models: Model[] }) {
                       {model.name}
                     </Link>
                     <p className="mt-1 text-xs text-muted">
-                      {model.provider}
+                      <Link href={`/providers/${providerSlug(model.provider)}`} className="underline">
+                        {model.provider}
+                      </Link>
                       {model.weightsFrom ? ` · ${model.weightsFrom} weights` : ""} · {statusLabel(model.status)}
                     </p>
                   </div>

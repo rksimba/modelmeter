@@ -1,5 +1,7 @@
 import { DATASET_CHECKED_ON, models, type Model } from "../data/models";
-import { estimateCost } from "../lib/pricing";
+import { comparisonPairs } from "../lib/comparisons";
+import { providerSlug, providers } from "../lib/models";
+import { modelIsPriced, estimateCost } from "../lib/pricing";
 
 const OFFICIAL_HOSTS = new Set([
   "openai.com",
@@ -107,7 +109,35 @@ if (!sample) {
   }
 }
 
+const providerSlugs = new Map<string, string>();
+for (const provider of providers()) {
+  const slug = providerSlug(provider);
+  if (!slug) errors.push(`Provider slug for ${provider} is empty`);
+  const existing = providerSlugs.get(slug);
+  if (existing) errors.push(`Provider slug collision ${slug} (${existing} and ${provider})`);
+  providerSlugs.set(slug, provider);
+}
+
+for (const model of models) {
+  if (model.slug.includes("-vs-")) {
+    errors.push(`${model.slug} contains "-vs-", which collides with comparison URLs`);
+  }
+}
+
+const pairs = comparisonPairs();
+const pairSlugs = new Set<string>();
+for (const pair of pairs) {
+  if (pairSlugs.has(pair.slug)) errors.push(`Duplicate comparison slug ${pair.slug}`);
+  pairSlugs.add(pair.slug);
+  if (pair.a.provider === pair.b.provider) errors.push(`${pair.slug} is not cross-provider`);
+  if (!modelIsPriced(pair.a) || !modelIsPriced(pair.b)) {
+    errors.push(`${pair.slug} includes an unpriced model`);
+  }
+}
+if (pairs.length === 0) errors.push("Same-tier comparison rule produced no pairs");
+
 console.log(`ModelMeter dataset check — ${models.length} rows, ledger date ${DATASET_CHECKED_ON}`);
+console.log(`Comparison pairs: ${pairs.length}`);
 for (const warning of warnings) console.warn(`WARN ${warning}`);
 for (const error of errors) console.error(`ERROR ${error}`);
 
