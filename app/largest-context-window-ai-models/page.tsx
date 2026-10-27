@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { JsonLd } from "@/components/json-ld";
 import { LedgerLinks } from "@/components/ledger-links";
 import { RateList } from "@/components/rate-list";
 import { DATASET_CHECKED_ON, models } from "@/data/models";
 import { formatIsoDate, formatTokens } from "@/lib/format";
 import { pageMetadata } from "@/lib/metadata";
+import { breadcrumbNode, jsonLdGraph, modelItemListNode } from "@/lib/structured-data";
 
 export const metadata = pageMetadata({
   title: "Largest context window AI models",
@@ -26,9 +28,20 @@ export default function LargestContextPage() {
     .filter((model) => model.contextTokens === null)
     .sort((a, b) => a.name.localeCompare(b.name));
   const largest = ranked[0]?.contextTokens ?? null;
+  const structuredData = jsonLdGraph([
+    breadcrumbNode([
+      { name: "Compare", path: "/" },
+      { name: "Largest context window AI models", path: "/largest-context-window-ai-models" },
+    ]),
+    modelItemListNode(
+      ranked.map((model) => ({ name: model.name, slug: model.slug })),
+      "Published context windows",
+    ),
+  ]);
 
   return (
     <main className="page">
+      <JsonLd data={structuredData} />
       <header className="max-w-3xl pt-6 sm:pt-10">
         <p className="text-sm text-muted">Last checked {formatIsoDate(DATASET_CHECKED_ON)}</p>
         <h1 className="display mt-4 text-5xl text-ink sm:text-6xl">Largest context window AI models</h1>

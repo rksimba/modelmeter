@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { JsonLd } from "@/components/json-ld";
 import { models } from "@/data/models";
 import { formatMonth, formatRelease, releaseSortValue } from "@/lib/format";
 import { pageMetadata } from "@/lib/metadata";
+import { breadcrumbNode, jsonLdGraph, modelItemListNode } from "@/lib/structured-data";
 
 export const metadata: Metadata = pageMetadata({
   title: "Releases",
@@ -26,8 +28,21 @@ export default function ReleasesPage() {
     groups.set(key, list);
   }
 
+  const listed = [
+    ...[...groups.values()].flat().map((model) => ({ name: model.name, slug: model.slug })),
+    ...undated.map((model) => ({ name: `${model.provider} — ${model.name}`, slug: model.slug })),
+  ];
+  const structuredData = jsonLdGraph([
+    breadcrumbNode([
+      { name: "Compare", path: "/" },
+      { name: "Releases", path: "/releases" },
+    ]),
+    modelItemListNode(listed, "Releases"),
+  ]);
+
   return (
     <main className="page page-narrow">
+      <JsonLd data={structuredData} />
       <header className="pt-6 sm:pt-10">
         <h1 className="display text-5xl text-ink sm:text-6xl">Releases</h1>
         <p className="mt-5 text-lg leading-relaxed text-muted">

@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { JsonLd } from "@/components/json-ld";
 import { LedgerLinks } from "@/components/ledger-links";
 import { RateList } from "@/components/rate-list";
 import { DATASET_CHECKED_ON, models, type Model } from "@/data/models";
 import { formatIsoDate } from "@/lib/format";
 import { pageMetadata } from "@/lib/metadata";
+import { breadcrumbNode, jsonLdGraph, modelItemListNode } from "@/lib/structured-data";
 
 export const metadata = pageMetadata({
   title: "Cheapest AI API prices",
@@ -30,9 +32,20 @@ export default function CheapestPage() {
   const unpriced = models
     .filter((model) => model.inputUsdPerMillion === null || model.outputUsdPerMillion === null)
     .sort((a, b) => a.name.localeCompare(b.name));
+  const structuredData = jsonLdGraph([
+    breadcrumbNode([
+      { name: "Compare", path: "/" },
+      { name: "Cheapest AI API prices", path: "/cheapest-ai-api" },
+    ]),
+    modelItemListNode(
+      byInput.map((model) => ({ name: model.name, slug: model.slug })),
+      "Lowest input rates",
+    ),
+  ]);
 
   return (
     <main className="page">
+      <JsonLd data={structuredData} />
       <header className="max-w-3xl pt-6 sm:pt-10">
         <p className="text-sm text-muted">Last checked {formatIsoDate(DATASET_CHECKED_ON)}</p>
         <h1 className="display mt-4 text-5xl text-ink sm:text-6xl">Cheapest AI API prices</h1>
