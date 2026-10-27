@@ -80,6 +80,28 @@ export function breadcrumbNode(items: { name: string; path: string }[]) {
   };
 }
 
+/**
+ * ItemList of model pages. `rows` is the models this page lists, in that order.
+ * `listName` is the visible heading for that list. ListItem `url` is absolute
+ * via absoluteUrl (NEXT_PUBLIC_SITE_URL).
+ */
+export function modelItemListNode(
+  rows: readonly { name: string; slug: string }[],
+  listName: string,
+) {
+  return {
+    "@type": "ItemList",
+    name: listName,
+    numberOfItems: rows.length,
+    itemListElement: rows.map((row, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: row.name,
+      url: absoluteUrl(`/models/${row.slug}`),
+    })),
+  };
+}
+
 export function jsonLdGraph(nodes: object[]) {
   return {
     "@context": "https://schema.org",

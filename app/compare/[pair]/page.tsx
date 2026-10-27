@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
+import { JsonLd } from "@/components/json-ld";
 import { LedgerLinks } from "@/components/ledger-links";
 import { comparisonByReversedSlug, comparisonBySlug, comparisonPairs, sameTierRuleSentence } from "@/lib/comparisons";
 import {
@@ -16,6 +17,7 @@ import {
 import { providerSlug } from "@/lib/models";
 import { pageMetadata } from "@/lib/metadata";
 import { CALCULATOR_DEFAULTS, DAYS_PER_MONTH, SAMPLE_WORKLOAD, estimateCost } from "@/lib/pricing";
+import { breadcrumbNode, jsonLdGraph } from "@/lib/structured-data";
 
 export const ensureStatic = "navigation";
 
@@ -60,6 +62,14 @@ export default async function ComparePairPage({
   const monthlyDelta = costA.perMonth - costB.perMonth;
   const cheaper = monthlyDelta < 0 ? pair.a : monthlyDelta > 0 ? pair.b : null;
   const dearer = cheaper === pair.a ? pair.b : pair.a;
+  const heading = `${pair.a.name} vs ${pair.b.name}`;
+  const structuredData = jsonLdGraph([
+    breadcrumbNode([
+      { name: "Compare", path: "/" },
+      { name: "Comparisons", path: "/compare" },
+      { name: heading, path: `/compare/${pair.slug}` },
+    ]),
+  ]);
 
   const rows: { label: string; a: string; b: string }[] = [
     ["Input / 1M", formatRate(pair.a.inputUsdPerMillion), formatRate(pair.b.inputUsdPerMillion)],
@@ -78,6 +88,7 @@ export default async function ComparePairPage({
 
   return (
     <main className="page">
+      <JsonLd data={structuredData} />
       <header className="max-w-3xl pt-6 sm:pt-10">
         <p className="text-sm text-muted">
           <Link href="/compare" className="hover:text-ink">
@@ -90,9 +101,7 @@ export default async function ComparePairPage({
             ? ""
             : `. ${pair.a.name} was checked ${formatIsoDate(pair.a.updatedAt)}. ${pair.b.name} was checked ${formatIsoDate(pair.b.updatedAt)}.`}
         </p>
-        <h1 className="display mt-4 text-5xl text-ink sm:text-6xl">
-          {pair.a.name} vs {pair.b.name}
-        </h1>
+        <h1 className="display mt-4 text-5xl text-ink sm:text-6xl">{heading}</h1>
         <p className="mt-5 text-lg leading-relaxed text-muted">
           {pair.a.name} is billed by {pair.a.provider}. {pair.b.name} is billed by {pair.b.provider}.{" "}
           {sameTierRuleSentence()} The figures below are the rates stored on those two rows, the

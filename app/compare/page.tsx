@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { JsonLd } from "@/components/json-ld";
 import { LedgerLinks } from "@/components/ledger-links";
 import { DATASET_CHECKED_ON } from "@/data/models";
 import { comparisonPairs, sameTierRuleSentence } from "@/lib/comparisons";
 import { formatIsoDate, formatRate } from "@/lib/format";
 import { pageMetadata } from "@/lib/metadata";
+import { breadcrumbNode, jsonLdGraph } from "@/lib/structured-data";
 
 export const metadata = pageMetadata({
   title: "Compare AI API prices",
@@ -16,8 +18,15 @@ export const ensureStatic = "navigation";
 
 export default function CompareIndexPage() {
   const pairs = comparisonPairs();
+  const structuredData = jsonLdGraph([
+    breadcrumbNode([
+      { name: "Compare", path: "/" },
+      { name: "Compare AI API prices", path: "/compare" },
+    ]),
+  ]);
   return (
     <main className="page page-narrow">
+      <JsonLd data={structuredData} />
       <header className="pt-6 sm:pt-10">
         <p className="text-sm text-muted">Last checked {formatIsoDate(DATASET_CHECKED_ON)}</p>
         <h1 className="display mt-4 text-5xl text-ink sm:text-6xl">Compare AI API prices</h1>

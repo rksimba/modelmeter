@@ -23,6 +23,10 @@ const OFFICIAL_HOSTS = new Set([
   "docs.together.ai",
   "console.groq.com",
   "groq.com",
+  "dev.meta.ai",
+  "about.fb.com",
+  "platform.kimi.ai",
+  "forum.moonshot.ai",
 ]);
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;

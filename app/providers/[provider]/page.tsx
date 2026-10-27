@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { JsonLd } from "@/components/json-ld";
 import { LedgerLinks } from "@/components/ledger-links";
 import { RateList } from "@/components/rate-list";
 import { comparisonsForProvider } from "@/lib/comparisons";
 import { formatIsoDate } from "@/lib/format";
 import { latestUpdate, modelsByProvider, providerFromSlug, providerSlug, providers } from "@/lib/models";
 import { pageMetadata } from "@/lib/metadata";
+import { breadcrumbNode, jsonLdGraph, modelItemListNode } from "@/lib/structured-data";
 
 export const ensureStatic = "navigation";
 
@@ -44,9 +46,22 @@ export default async function ProviderPage({
   const pairs = comparisonsForProvider(provider);
   const hosts = [...new Set(rows.map((model) => model.weightsFrom).filter(Boolean))];
   const others = providers().filter((name) => name !== provider);
+  const heading = `${provider} API prices`;
+  const structuredData = jsonLdGraph([
+    breadcrumbNode([
+      { name: "Compare", path: "/" },
+      { name: "Providers", path: "/providers" },
+      { name: heading, path: `/providers/${slug}` },
+    ]),
+    modelItemListNode(
+      rows.map((model) => ({ name: model.name, slug: model.slug })),
+      "Models and prices",
+    ),
+  ]);
 
   return (
     <main className="page">
+      <JsonLd data={structuredData} />
       <header className="max-w-3xl pt-6 sm:pt-10">
         <p className="text-sm text-muted">
           <Link href="/providers" className="hover:text-ink">
@@ -54,7 +69,7 @@ export default async function ProviderPage({
           </Link>
         </p>
         <p className="mt-4 text-sm text-muted">Last checked {formatIsoDate(checked)}</p>
-        <h1 className="display mt-4 text-5xl text-ink sm:text-6xl">{provider} API prices</h1>
+        <h1 className="display mt-4 text-5xl text-ink sm:text-6xl">{heading}</h1>
         <p className="mt-5 text-lg leading-relaxed text-muted">
           {provider} has {rows.length} {rows.length === 1 ? "model" : "models"} in this ledger.
           Each price is the rate named on the row, copied from that model&apos;s official page. If
