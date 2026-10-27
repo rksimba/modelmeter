@@ -47,8 +47,7 @@ export default function HomePage() {
       <section className="rounded-2xl border border-line bg-paper-2 p-6 sm:p-10">
         <h2 className="text-lg font-medium">Price-change notes</h2>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          A short email when a tracked rate changes. The form is a stub: Resend is not connected,
-          and this address is not stored.
+          A short email when a tracked price changes or a model launches.
         </p>
         <div className="mt-4 max-w-xl">
           <NewsletterForm />

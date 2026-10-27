@@ -19,14 +19,14 @@ npm run dev -- --port 43123
 
 ## Deploy on Vercel
 
-Import the git repository. Framework preset: Next.js. No environment variables are required.
-
-Optional:
+Import the git repository. Framework preset: Next.js. The site builds and serves prices with no environment variables. Newsletter contact storage uses `RESEND_API_KEY` and `RESEND_SEGMENT_ID`, which are set in Vercel.
 
 | Variable | Purpose |
 | --- | --- |
 | `NEXT_PUBLIC_SITE_URL` | Canonical origin for sitemap, Open Graph, and `llms.txt`. On Vercel this falls back to `VERCEL_PROJECT_PRODUCTION_URL` or `VERCEL_URL`. |
 | `NEXT_PUBLIC_VERCEL_ANALYTICS` | Set to `1` to load Vercel Analytics. Off by default. No other tracking is included. |
+| `RESEND_API_KEY` | Resend API key. Set in Vercel. The subscribe route uses it only to store a contact. |
+| `RESEND_SEGMENT_ID` | Resend segment id. Set in Vercel. Stored contacts are added to this segment. |
 
 Sponsored slots and affiliate links stay off until you change `lib/site.ts`.
 
@@ -70,10 +70,10 @@ Prices are USD per 1 million tokens. The number is the specific rate named in `p
 | `/sponsor` | Placeholder. No packages or terms |
 | `/api/models.json` | Full dataset |
 | `/llms.txt`, `/llms-full.txt` | Plain-text summary for chatbots |
-| `/api/subscribe` | Newsletter stub. It stores nothing and sends nothing |
+| `/api/subscribe` | Stores a newsletter contact in Resend. Sends no email. Returns 501 when `RESEND_API_KEY` or `RESEND_SEGMENT_ID` is missing. |
 
 ## Newsletter and monetisation
 
-`/api/subscribe` validates the email shape and returns HTTP 501. Wire Resend later inside that route. Until then the form tells the visitor the address was not stored.
+`/api/subscribe` validates the email shape, then stores the address as a Resend contact when `RESEND_API_KEY` and `RESEND_SEGMENT_ID` are set. Both variables are set in Vercel. The contact is created with `unsubscribed: false` and added to that segment. A duplicate contact is treated as success. The site never sends email: nothing in this route calls Resend's email API, and no confirmation is sent from the site. If either variable is missing, the route returns HTTP 501, stores nothing, and sends nothing.
 
 `lib/site.ts` holds `sponsoredSlots` and `affiliateLinks`, both `false`. The sponsored and affiliate components render nothing while those flags are false. The footer always carries an affiliate disclosure.

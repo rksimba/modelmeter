@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-type Status = "idle" | "sending" | "unconnected" | "invalid" | "error";
+type Status = "idle" | "sending" | "success" | "invalid" | "error";
 
 export function NewsletterForm() {
   const [email, setEmail] = useState("");
@@ -19,16 +19,23 @@ export function NewsletterForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-      const body = (await response.json()) as { message?: string };
+      const body = (await response.json()) as { ok?: boolean; message?: string };
+      if (response.ok && body.ok === true) {
+        setStatus("success");
+        setMessage(
+          body.message ??
+            "You're on the list. We only email when a tracked price changes or a model launches.",
+        );
+        return;
+      }
       if (response.status === 400) {
         setStatus("invalid");
         setMessage(body.message ?? "Enter a valid email address.");
         return;
       }
-      setStatus("unconnected");
+      setStatus("error");
       setMessage(
-        body.message ??
-          "Signup is not connected yet. This address was not stored and no email was sent.",
+        body.message ?? "Could not save your signup right now. Please try again later.",
       );
     } catch {
       setStatus("error");
@@ -58,11 +65,11 @@ export function NewsletterForm() {
           disabled={status === "sending"}
           className="h-11 shrink-0 rounded-full bg-ink px-5 text-sm font-medium text-paper transition-opacity hover:opacity-80 disabled:opacity-60"
         >
-          {status === "sending" ? "Sending…" : "Get price updates"}
+          {status === "sending" ? "Saving…" : "Get price updates"}
         </button>
       </div>
       <p className="text-xs text-muted">
-        Delivery is not connected yet. Submitting does not store the address or send mail.
+        We only email when a tracked price changes or a model launches.
       </p>
       {message ? (
         <p

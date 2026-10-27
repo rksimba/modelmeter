@@ -45,7 +45,7 @@ export default function AboutPage() {
       <section className="rounded-2xl border border-line bg-paper-2 p-6 sm:p-8">
         <h2 className="text-lg font-medium">Price-change notes</h2>
         <p className="mt-2 text-sm text-muted">
-          The form posts to a stub. No message is sent and the address is not kept.
+          A short email when a tracked price changes or a model launches.
         </p>
         <div className="mt-4">
           <NewsletterForm />
