@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #f5f5f7;
+  --paper-2: #ffffff;
+  --ink: #1d1d1f;
+  --muted: #424245;
+  --line: #d2d2d7;
+  --nav: rgb(255 255 255 / 0.8);
+  --accent: #0066cc;
+  --accent-soft: #e8f2fc;
+  --danger: #9f1239;
+  --copper: var(--accent);
+  --copper-soft: var(--accent-soft);
+  --pine: var(--accent);
+  --pine-soft: var(--accent-soft);
+  --chip: #f5f5f7;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #000000;
+    --paper-2: #1c1c1e;
+    --ink: #f5f5f7;
+    --muted: #a1a1a6;
+    --line: #38383a;
+    --nav: rgb(0 0 0 / 0.72);
+    --accent: #6cb6ff;
+    --accent-soft: #0e2744;
+    --danger: #ff8fa3;
+    --chip: #2c2c2e;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-nav: var(--nav);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-danger: var(--danger);
+  --color-copper: var(--copper);
+  --color-copper-soft: var(--copper-soft);
+  --color-pine: var(--pine);
+  --color-pine-soft: var(--pine-soft);
+  --color-chip: var(--chip);
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", var(--font-inter), sans-serif;
+}
+
+html {
+  background: var(--paper);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", var(--font-inter), Inter, sans-serif;
+  letter-spacing: -0.011em;
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+a {
+  text-underline-offset: 3px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+
+.display {
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.page {
+  margin-inline: auto;
+  display: flex;
+  width: 100%;
+  max-width: 72rem;
+  flex-direction: column;
+  gap: 3.5rem;
+  padding: 3.5rem 1.25rem 5rem;
+}
+
+.page-narrow {
+  max-width: 42rem;
+}
+
+@media (min-width: 640px) {
+  .page {
+    gap: 4.5rem;
+    padding: 5rem 2rem 6rem;
+  }
+}
