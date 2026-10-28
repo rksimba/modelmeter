@@ -50,6 +50,12 @@ export function indexablePaths(): IndexablePath[] {
       summary: "One page per company that bills an API in this ledger.",
     },
     {
+      path: "/models",
+      lastModified: checked,
+      title: "AI models",
+      summary: "Every model in the ledger, with its stored list price, rate label, and source link.",
+    },
+    {
       path: "/compare",
       lastModified: checked,
       title: "Compare AI API prices",

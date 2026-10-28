@@ -3,6 +3,7 @@ import Link from "next/link";
 const links = [
   { href: "/", label: "Full comparison" },
   { href: "/providers", label: "Prices by provider" },
+  { href: "/models", label: "All models" },
   { href: "/compare", label: "Same-tier comparisons" },
   { href: "/cheapest-ai-api", label: "Cheapest stored rates" },
   { href: "/largest-context-window-ai-models", label: "Largest context windows" },

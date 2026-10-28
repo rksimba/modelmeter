@@ -75,6 +75,7 @@ Prices are USD per 1 million tokens. The number is the specific rate named in `p
 | `/cheapest-ai-api` | Ranked by stored input rate and, separately, by stored output rate |
 | `/largest-context-window-ai-models` | Ranked by the published context window |
 | `/releases` | Reverse-chronological releases with source links |
+| `/models` | Every model in the ledger, with its stored rate and a link to the model page |
 | `/models/[slug]` | One model, its rate, limits, source, updated date, and related links |
 | `/about` | Methodology and a newsletter form |
 | `/sponsor` | Placeholder. No packages or terms |

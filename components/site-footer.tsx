@@ -32,6 +32,9 @@ export function SiteFooter() {
           <Link href="/providers" className="hover:text-ink">
             All providers
           </Link>
+          <Link href="/models" className="hover:text-ink">
+            All models
+          </Link>
           <Link href="/compare" className="hover:text-ink">
             Comparisons
           </Link>
