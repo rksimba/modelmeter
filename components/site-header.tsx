@@ -3,6 +3,7 @@ import Link from "next/link";
 const links = [
   { href: "/", label: "Compare" },
   { href: "/providers", label: "Providers" },
+  { href: "/models", label: "Models" },
   { href: "/compare", label: "Comparisons" },
   { href: "/cheapest-ai-api", label: "Cheapest" },
   { href: "/largest-context-window-ai-models", label: "Context" },
