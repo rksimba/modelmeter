@@ -32,6 +32,13 @@ export function indexablePaths(): IndexablePath[] {
       summary: "Release dates copied from official announcements. Month-only dates stay month-only.",
     },
     {
+      path: "/price-changes",
+      lastModified: checked,
+      title: "AI API price changes",
+      summary:
+        "Dated changes to stored list prices, new models, and scheduled rates, each linked to the official source. RSS: /price-changes.xml.",
+    },
+    {
       path: "/about",
       lastModified: checked,
       title: "About",

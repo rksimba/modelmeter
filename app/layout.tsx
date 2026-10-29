@@ -37,6 +37,7 @@ export const metadata: Metadata = {
     types: {
       "text/plain": [{ url: "/llms.txt", title: "llms.txt" }],
       "application/json": [{ url: "/api/models.json", title: "Model dataset" }],
+      "application/rss+xml": [{ url: "/price-changes.xml", title: "AI API price changes" }],
     },
   },
 };

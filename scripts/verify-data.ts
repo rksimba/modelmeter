@@ -1,4 +1,5 @@
-import { DATASET_CHECKED_ON, models, type Model } from "../data/models";
+import { DATASET_CHECKED_ON, models, type Model, type ModelStatus } from "../data/models";
+import { priceChanges, type PriceChangeKind } from "../data/price-changes";
 import { comparisonPairs } from "../lib/comparisons";
 import { providerSlug, providers } from "../lib/models";
 import { modelIsPriced, estimateCost } from "../lib/pricing";
@@ -31,6 +32,13 @@ const OFFICIAL_HOSTS = new Set([
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const ISO_MONTH = /^\d{4}-\d{2}$/;
+const STATUSES = new Set<ModelStatus>(["active", "preview", "legacy", "limited"]);
+const PRICE_CHANGE_KINDS = new Set<PriceChangeKind>([
+  "price cut",
+  "price increase",
+  "new model",
+  "scheduled change",
+]);
 const errors: string[] = [];
 const warnings: string[] = [];
 const slugs = new Set<string>();
@@ -40,18 +48,22 @@ const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 function checkUrl(model: Model, field: "sourceUrl" | "limitsSourceUrl" | "releaseSourceUrl") {
   const value = model[field];
   if (!value) return;
+  checkHost(`${model.slug} ${field}`, value);
+}
+
+function checkHost(label: string, value: string) {
   let url: URL;
   try {
     url = new URL(value);
   } catch {
-    errors.push(`${model.slug} ${field} is not a URL: ${value}`);
+    errors.push(`${label} is not a URL: ${value}`);
     return;
   }
   if (url.protocol !== "https:") {
-    errors.push(`${model.slug} ${field} must be https: ${value}`);
+    errors.push(`${label} must be https: ${value}`);
   }
   if (!OFFICIAL_HOSTS.has(url.hostname)) {
-    errors.push(`${model.slug} ${field} host is not on the official list: ${url.hostname}`);
+    errors.push(`${label} host is not on the official list: ${url.hostname}`);
   }
 }
 
@@ -82,6 +94,9 @@ for (const model of models) {
   }
   if (!model.priceLabel.trim()) errors.push(`${model.slug} is missing priceLabel`);
   if (!model.notes.trim()) errors.push(`${model.slug} is missing notes`);
+  if (!STATUSES.has(model.status)) {
+    errors.push(`${model.slug} has unknown status ${model.status}`);
+  }
 
   checkUrl(model, "sourceUrl");
   checkUrl(model, "limitsSourceUrl");
@@ -140,8 +155,54 @@ for (const pair of pairs) {
 }
 if (pairs.length === 0) errors.push("Same-tier comparison rule produced no pairs");
 
+const changeKeys = new Set<string>();
+for (const change of priceChanges) {
+  const key = `${change.modelSlug}|${change.date}|${change.kind}`;
+  if (changeKeys.has(key)) errors.push(`Duplicate price change ${key}`);
+  changeKeys.add(key);
+
+  if (!ISO_DATE.test(change.date)) errors.push(`${key} date must be YYYY-MM-DD`);
+  if (!PRICE_CHANGE_KINDS.has(change.kind)) errors.push(`${key} has unknown kind ${change.kind}`);
+  if (!change.note.trim()) errors.push(`${key} is missing a note`);
+  if (!change.provider.trim()) errors.push(`${key} is missing provider`);
+  checkHost(`${key} sourceUrl`, change.sourceUrl);
+  if (change.alsoSourceUrl) checkHost(`${key} alsoSourceUrl`, change.alsoSourceUrl);
+
+  const model = models.find((row) => row.slug === change.modelSlug);
+  if (!model) {
+    errors.push(`${key} slug is not in the ledger`);
+    continue;
+  }
+  if (model.provider !== change.provider) {
+    errors.push(`${key} provider ${change.provider} does not match ${model.provider}`);
+  }
+
+  const rateFields = ["inputUsdPerMillion", "cachedInputUsdPerMillion", "outputUsdPerMillion"] as const;
+  for (const field of rateFields) {
+    const value = change.newRates[field];
+    if (value !== null && (!Number.isFinite(value) || value < 0)) {
+      errors.push(`${key} newRates.${field} must be a non-negative number or null`);
+    }
+    const previous = change.oldRates?.[field];
+    if (change.oldRates && previous !== null && previous !== undefined && (!Number.isFinite(previous) || previous < 0)) {
+      errors.push(`${key} oldRates.${field} must be a non-negative number or null`);
+    }
+  }
+
+  if (change.kind === "new model" && change.oldRates !== null) {
+    errors.push(`${key} is a new model and must have null old rates`);
+  }
+  if (change.kind !== "new model" && change.oldRates === null) {
+    errors.push(`${key} must record the previous rates`);
+  }
+  if (change.kind === "scheduled change" && ISO_DATE.test(change.date) && change.date <= DATASET_CHECKED_ON) {
+    errors.push(`${key} is scheduled on or before the ledger check date ${DATASET_CHECKED_ON}`);
+  }
+}
+
 console.log(`ModelMeter dataset check — ${models.length} rows, ledger date ${DATASET_CHECKED_ON}`);
 console.log(`Comparison pairs: ${pairs.length}`);
+console.log(`Price changes: ${priceChanges.length}`);
 for (const warning of warnings) console.warn(`WARN ${warning}`);
 for (const error of errors) console.error(`ERROR ${error}`);
 

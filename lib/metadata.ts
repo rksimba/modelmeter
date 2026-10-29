@@ -38,7 +38,14 @@ export function pageMetadata({
   return {
     title: absoluteTitle ? { absolute: title } : title,
     description,
-    alternates: { canonical },
+    alternates: {
+      canonical,
+      types: {
+        "text/plain": [{ url: "/llms.txt", title: "llms.txt" }],
+        "application/json": [{ url: "/api/models.json", title: "Model dataset" }],
+        "application/rss+xml": [{ url: "/price-changes.xml", title: "AI API price changes" }],
+      },
+    },
     openGraph: {
       title: socialTitle,
       description,

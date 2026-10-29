@@ -102,5 +102,6 @@ export function formatModalities(model: Model): string {
 export function statusLabel(status: Model["status"]): string {
   if (status === "preview") return "Preview";
   if (status === "legacy") return "Legacy";
+  if (status === "limited") return "Limited access";
   return "Active";
 }

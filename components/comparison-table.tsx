@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { StatusLabel } from "@/components/status-label";
 import type { Model } from "@/data/models";
 import {
   formatIsoDate,
@@ -10,7 +11,6 @@ import {
   formatRelease,
   formatTokens,
   releaseSortValue,
-  statusLabel,
 } from "@/lib/format";
 import { providerSlug } from "@/lib/models";
 
@@ -242,7 +242,7 @@ export function ComparisonTable({ models }: { models: Model[] }) {
                         {model.name}
                       </Link>
                       <span className="mt-1 block text-xs font-normal text-muted">
-                        {statusLabel(model.status)}
+                        <StatusLabel status={model.status} />
                         {model.weightsFrom ? ` · ${model.weightsFrom} weights` : ""}
                       </span>
                       <a
@@ -292,7 +292,7 @@ export function ComparisonTable({ models }: { models: Model[] }) {
                       <Link href={`/providers/${providerSlug(model.provider)}`} className="underline">
                         {model.provider}
                       </Link>
-                      {model.weightsFrom ? ` · ${model.weightsFrom} weights` : ""} · {statusLabel(model.status)}
+                      {model.weightsFrom ? ` · ${model.weightsFrom} weights` : ""} · <StatusLabel status={model.status} />
                     </p>
                   </div>
                   <a href={model.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-accent underline">

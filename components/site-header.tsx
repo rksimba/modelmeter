@@ -9,6 +9,7 @@ const links = [
   { href: "/largest-context-window-ai-models", label: "Context" },
   { href: "/calculator", label: "Calculator" },
   { href: "/releases", label: "Releases" },
+  { href: "/price-changes", label: "Price changes" },
   { href: "/about", label: "About" },
 ];
 

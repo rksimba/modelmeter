@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { JsonLd } from "@/components/json-ld";
+import { StatusLabel } from "@/components/status-label";
 import { models } from "@/data/models";
+import { priceChanges } from "@/data/price-changes";
 import { comparisonsForModel } from "@/lib/comparisons";
 import {
   formatIsoDate,
@@ -10,7 +12,6 @@ import {
   formatRate,
   formatRelease,
   formatTokens,
-  statusLabel,
 } from "@/lib/format";
 import { modelsByProvider, providerSlug } from "@/lib/models";
 import { absoluteUrl, pageMetadata } from "@/lib/metadata";
@@ -52,6 +53,7 @@ export default async function ModelPage({
   const pagePath = `/models/${model.slug}`;
   const description = `${model.provider} ${model.name}: input ${formatRate(model.inputUsdPerMillion)}, output ${formatRate(model.outputUsdPerMillion)} per 1M tokens (${model.priceLabel}).`;
   const siblings = modelsByProvider(model.provider).filter((item) => item.slug !== model.slug);
+  const hasPriceChanges = priceChanges.some((change) => change.modelSlug === model.slug);
   const pairs = comparisonsForModel(model.slug);
   const crumbs = [
     { name: "Compare", path: "/" },
@@ -81,7 +83,7 @@ export default async function ModelPage({
     ["Max output", formatTokens(model.maxOutputTokens)],
     ["Modalities", formatModalities(model)],
     ["Released", formatRelease(model)],
-    ["Status", statusLabel(model.status)],
+    ["Status", ""],
     ["API id", model.apiId ?? "n/a"],
     ["Updated", formatIsoDate(model.updatedAt)],
   ];
@@ -109,7 +111,7 @@ export default async function ModelPage({
         </nav>
         <h1 className="display mt-3 text-5xl text-ink sm:text-6xl">{model.name}</h1>
         <p className="mt-2 text-sm text-muted">
-          {statusLabel(model.status)}
+          <StatusLabel status={model.status} />
           {model.weightsFrom ? ` · Weights from ${model.weightsFrom}` : ""}
           {model.apiId ? ` · ${model.apiId}` : ""}
         </p>
@@ -119,7 +121,9 @@ export default async function ModelPage({
         {facts.map(([label, value]) => (
           <div key={label} className="bg-paper-2 px-5 py-4">
             <dt className="text-xs text-muted">{label}</dt>
-            <dd className="num mt-1 text-sm">{value}</dd>
+            <dd className="num mt-1 text-sm">
+              {label === "Status" ? <StatusLabel status={model.status} /> : value}
+            </dd>
           </div>
         ))}
       </dl>
@@ -163,6 +167,13 @@ export default async function ModelPage({
             All {model.provider} prices
           </Link>
         </p>
+        {hasPriceChanges ? (
+          <p className="mt-3 text-sm">
+            <Link href="/price-changes" className="text-accent underline">
+              Price changes for {model.name}
+            </Link>
+          </p>
+        ) : null}
         {siblings.length > 0 ? (
           <ul className="mt-3 space-y-2 text-sm">
             {siblings.map((item) => (
