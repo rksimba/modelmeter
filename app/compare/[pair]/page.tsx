@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "@/components/json-ld";
+import { StatusLabel } from "@/components/status-label";
 import { LedgerLinks } from "@/components/ledger-links";
 import { comparisonByReversedSlug, comparisonBySlug, comparisonPairs, sameTierRuleSentence } from "@/lib/comparisons";
 import {
@@ -12,7 +13,6 @@ import {
   formatTokens,
   formatUsd,
   formatUsdExact,
-  statusLabel,
 } from "@/lib/format";
 import { providerSlug } from "@/lib/models";
 import { pageMetadata } from "@/lib/metadata";
@@ -78,7 +78,7 @@ export default async function ComparePairPage({
     ["Rate", pair.a.priceLabel, pair.b.priceLabel],
     ["Context", formatTokens(pair.a.contextTokens), formatTokens(pair.b.contextTokens)],
     ["Max output", formatTokens(pair.a.maxOutputTokens), formatTokens(pair.b.maxOutputTokens)],
-    ["Status", statusLabel(pair.a.status), statusLabel(pair.b.status)],
+    ["Status", "", ""],
     ["Modalities", formatModalities(pair.a), formatModalities(pair.b)],
     ["Released", formatRelease(pair.a), formatRelease(pair.b)],
     ["Checked", formatIsoDate(pair.a.updatedAt), formatIsoDate(pair.b.updatedAt)],
@@ -154,8 +154,12 @@ export default async function ComparePairPage({
                   <th scope="row" className="px-4 py-3 font-medium text-muted">
                     {row.label}
                   </th>
-                  <td className="px-4 py-3">{row.a}</td>
-                  <td className="px-4 py-3">{row.b}</td>
+                  <td className="px-4 py-3">
+                    {row.label === "Status" ? <StatusLabel status={pair.a.status} /> : row.a}
+                  </td>
+                  <td className="px-4 py-3">
+                    {row.label === "Status" ? <StatusLabel status={pair.b.status} /> : row.b}
+                  </td>
                 </tr>
               ))}
             </tbody>

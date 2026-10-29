@@ -1,6 +1,7 @@
 import { DATASET_CHECKED_ON, models } from "@/data/models";
 import { comparisonPairs, sameTierRuleSentence } from "@/lib/comparisons";
-import { formatModalities, formatRate, formatRelease, formatTokens, formatUsd, formatUsdExact } from "@/lib/format";
+import { formatModalities, formatRate, formatRelease, formatTokens, formatUsd, formatUsdExact, statusLabel } from "@/lib/format";
+import { priceChangesPlainText } from "@/lib/price-changes";
 import { SAMPLE_WORKLOAD, estimateCost } from "@/lib/pricing";
 import { indexablePaths } from "@/lib/routes";
 import { absoluteUrl } from "@/lib/metadata";
@@ -18,7 +19,7 @@ function rowLine(model: (typeof models)[number]): string {
     `context ${formatTokens(model.contextTokens)}, max output ${formatTokens(model.maxOutputTokens)}`,
     `modalities ${formatModalities(model)}`,
     `released ${formatRelease(model)}`,
-    `status ${model.status}`,
+    `status ${statusLabel(model.status)}`,
     `checked ${model.updatedAt}`,
     `source ${model.sourceUrl}`,
   ].join(" | ");
@@ -103,6 +104,8 @@ export function llmsFullTxt(): string {
     }),
     "",
     ...blocks,
+    "",
+    priceChangesPlainText(),
     "",
   ].join("\n");
 }

@@ -50,6 +50,9 @@ export function SiteFooter() {
           <Link href="/releases" className="hover:text-ink">
             Releases
           </Link>
+          <Link href="/price-changes" className="hover:text-ink">
+            Price changes
+          </Link>
           <Link href="/sponsor" className="hover:text-ink">
             Sponsor
           </Link>

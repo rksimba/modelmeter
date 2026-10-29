@@ -38,8 +38,9 @@ Do this once a day, or whenever a provider announces a price change. Do not copy
 2. Change a number only when the official page shows a different figure. If a value disappears from the page, set that field to `null`.
 3. Set `updatedAt` to the day you checked the page, even when the price did not change. Use `YYYY-MM-DD`.
 4. Keep `DATASET_CHECKED_ON` in `data/models.ts` on the same day.
-5. Add a model by copying a row. `slug` must be unique. `sourceUrl` must be an `https` page on a host listed in `scripts/verify-data.ts`. Add a new host only when it is that provider’s own site.
-6. Run:
+5. When a stored price changes, add an entry to the price-change data file, `data/price-changes.ts`. A new model and a scheduled rate that an official page already publishes belong in that file too. `/price-changes` and `/price-changes.xml` read it.
+6. Add a model by copying a row. `slug` must be unique. `sourceUrl` must be an `https` page on a host listed in `scripts/verify-data.ts`. Add a new host only when it is that provider’s own site.
+7. Run:
 
 ```bash
 npm run verify-data
@@ -48,9 +49,9 @@ npm run build
 
 `verify-data` fails if any row is missing `sourceUrl` or `updatedAt`, if a URL is not on the official-host list, or if the cost formula breaks. It prints a warning, and still exits 0, when a row’s `updatedAt` is older than 7 days. Those warnings are the cue to re-check that provider.
 
-7. Commit the data change and push. Vercel rebuilds the static pages from the file.
+8. Commit the data change and push. Vercel rebuilds the static pages from the file.
 
-The calculator, provider pages, same-tier comparisons, cheapest and context rankings, `/sitemap.xml`, `/api/models.json`, `/llms.txt`, and `/llms-full.txt` all read the same file. You do not update them separately.
+The calculator, provider pages, same-tier comparisons, cheapest and context rankings, `/sitemap.xml`, `/api/models.json`, `/llms.txt`, and `/llms-full.txt` all read `data/models.ts`. You do not update them separately. `/price-changes`, `/price-changes.xml`, and the price-change section of `/llms-full.txt` read `data/price-changes.ts`.
 
 `sitemap.xml` sets `lastmod` from each row’s `updatedAt` on model pages, from the latest `updatedAt` among a provider’s rows on provider pages, from the later of the two rows on a comparison, and from `DATASET_CHECKED_ON` on the other pages. Set `NEXT_PUBLIC_SITE_URL` to the public origin (for example `https://modelmeter.live`) so canonical URLs, Open Graph URLs, the sitemap, and `llms.txt` use that host. Without it, a Vercel production build uses `VERCEL_PROJECT_PRODUCTION_URL`.
 
@@ -75,11 +76,13 @@ Prices are USD per 1 million tokens. The number is the specific rate named in `p
 | `/cheapest-ai-api` | Ranked by stored input rate and, separately, by stored output rate |
 | `/largest-context-window-ai-models` | Ranked by the published context window |
 | `/releases` | Reverse-chronological releases with source links |
+| `/price-changes` | Dated list-price changes, new models, and scheduled rates, newest first |
+| `/price-changes.xml` | RSS 2.0 feed of those entries |
 | `/models` | Every model in the ledger, with its stored rate and a link to the model page |
 | `/models/[slug]` | One model, its rate, limits, source, updated date, and related links |
 | `/about` | Methodology and a newsletter form |
 | `/sponsor` | Placeholder. No packages or terms |
-| `/api/models.json` | Full dataset |
+| `/api/models.json` | Full dataset. `/models.json` permanently redirects here (HTTP 308) |
 | `/llms.txt`, `/llms-full.txt` | Plain-text summary for chatbots, including the pages above |
 | `/sitemap.xml` | Those pages, with `lastmod` from the ledger dates |
 | `/api/subscribe` | Stores a newsletter contact in Resend. Sends no email. Returns 501 when `RESEND_API_KEY` or `RESEND_SEGMENT_ID` is missing. |

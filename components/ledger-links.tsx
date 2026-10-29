@@ -9,6 +9,7 @@ const links = [
   { href: "/largest-context-window-ai-models", label: "Largest context windows" },
   { href: "/calculator", label: "Cost calculator" },
   { href: "/releases", label: "Releases" },
+  { href: "/price-changes", label: "Price changes" },
 ];
 
 export function LedgerLinks({ current }: { current?: string }) {

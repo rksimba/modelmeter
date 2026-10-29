@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Model } from "@/data/models";
-import { formatIsoDate, formatRate, formatTokens, statusLabel } from "@/lib/format";
+import { StatusLabel } from "@/components/status-label";
+import { formatIsoDate, formatRate, formatTokens } from "@/lib/format";
 import { providerSlug } from "@/lib/models";
 
 export function RateList({
@@ -66,7 +67,7 @@ export function RateList({
                     {model.name}
                   </Link>
                   <span className="mt-1 block text-xs font-normal text-muted">
-                    {statusLabel(model.status)}
+                    <StatusLabel status={model.status} />
                     {model.weightsFrom ? ` · ${model.weightsFrom} weights` : ""}
                   </span>
                 </th>
@@ -120,7 +121,7 @@ export function RateList({
                   ) : (
                     model.provider
                   )}
-                  {model.weightsFrom ? ` · ${model.weightsFrom} weights` : ""} · {statusLabel(model.status)}
+                  {model.weightsFrom ? ` · ${model.weightsFrom} weights` : ""} · <StatusLabel status={model.status} />
                 </p>
               </div>
               <a href={model.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-accent underline">

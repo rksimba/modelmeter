@@ -6,9 +6,9 @@
  * on DATASET_CHECKED_ON. Do not fill gaps from memory or from other trackers.
  * If a provider has not published a value, leave it null.
  */
-export const DATASET_CHECKED_ON = "2026-10-29";
+export const DATASET_CHECKED_ON = "2026-10-30";
 
-export type ModelStatus = "active" | "preview" | "legacy";
+export type ModelStatus = "active" | "preview" | "legacy" | "limited";
 
 export type Model = {
   slug: string;
@@ -235,6 +235,32 @@ export const models: Model[] = [
       "Rate for prompts up to 100,000 tokens. The same pricing table lists prompts over 100,000 tokens at $0.50 input, $0.05 cache hits, and $2.50 output per 1M tokens. Cache writes are $0.125 (5-minute) and $0.20 (1-hour) at the short rate. Context is published as 1M tokens and max output as 128K. Modalities were not listed on the pages checked.",
   },
   {
+    slug: "gemini-4-carbon",
+    provider: "Google",
+    name: "Gemini 4 Carbon",
+    apiId: null,
+    weightsFrom: null,
+    inputUsdPerMillion: 2,
+    cachedInputUsdPerMillion: 0.1,
+    outputUsdPerMillion: 10,
+    contextTokens: null,
+    maxOutputTokens: null,
+    inputModalities: null,
+    outputModalities: null,
+    releaseDate: "2026-10-28",
+    releaseMonth: null,
+    status: "limited",
+    sourceUrl:
+      "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-carbon/",
+    limitsSourceUrl: null,
+    releaseSourceUrl:
+      "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-carbon/",
+    updatedAt: checked,
+    priceLabel: "Announced introductory rate, limited access",
+    notes:
+      "Access is limited to a subset of cyber defenders through Google's Fairwind Program, with developer, business, and consumer access described as coming as soon as possible. The rates are the announced introductory price, not a row on the Gemini API pricing table: $2 input and $10 output per 1M tokens, with cached input at the stated 95% discount off the $2 input price ($0.10). After the introductory period the announcement lists $4 per 1M input tokens and $20 per 1M output tokens. No API model id, context window, max output, or modality list is published.",
+  },
+  {
     slug: "gemini-4-argon",
     provider: "Google",
     name: "Gemini 4 Argon",
@@ -362,9 +388,9 @@ export const models: Model[] = [
     name: "Mistral Large 4",
     apiId: "mistral-large-4",
     weightsFrom: null,
-    inputUsdPerMillion: 1.36,
-    cachedInputUsdPerMillion: 0.14,
-    outputUsdPerMillion: 4.18,
+    inputUsdPerMillion: 0.7,
+    cachedInputUsdPerMillion: 0.07,
+    outputUsdPerMillion: 2.1,
     contextTokens: 1_000_000,
     maxOutputTokens: null,
     inputModalities: null,
@@ -374,11 +400,11 @@ export const models: Model[] = [
     status: "preview",
     sourceUrl: "https://docs.mistral.ai/inference/pricing",
     limitsSourceUrl: "https://docs.mistral.ai/models/mistral-large-4",
-    releaseSourceUrl: "https://docs.mistral.ai/models/mistral-large-4",
+    releaseSourceUrl: "https://mistral.ai/news/mistral-large-4-oss/",
     updatedAt: checked,
     priceLabel: "Standard",
     notes:
-      "Standard USD rates from the API pricing table. The model card lists a 1M context window and Public Preview status, dated 6 October 2026. The changelog's launch note said 50% off for two weeks from that date; the pricing page on the check date shows the rates recorded here. Max output and a modality list were not in the text extracted from those pages. The card describes the model as multimodal with a vision encoder.",
+      "Standard USD rates from the API pricing table: $0.70 input, $0.07 cached input, and $2.10 output per 1M tokens. On 29 October 2026 Mistral released open weights for an improved Mistral Large 4 (Le Chonk) under the Mistral Ecosystem Open-Weight License, a modified MIT license that requires a separate commercial license for Model-as-a-Service, and priced the API at those rates; the previous ledger rate was $1.36 input, $0.14 cached input, and $4.18 output. The model card lists a 1M context window and Public Preview (v26.10). Max output is not published.",
   },
   {
     slug: "mistral-medium-3-5",
