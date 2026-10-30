@@ -6,9 +6,9 @@
  * on DATASET_CHECKED_ON. Do not fill gaps from memory or from other trackers.
  * If a provider has not published a value, leave it null.
  */
-export const DATASET_CHECKED_ON = "2026-10-30";
+export const DATASET_CHECKED_ON = "2026-10-31";
 
-export type ModelStatus = "active" | "preview" | "legacy" | "limited";
+export type ModelStatus = "active" | "preview" | "legacy" | "limited" | "deprecated";
 
 export type Model = {
   slug: string;
@@ -137,6 +137,30 @@ export const models: Model[] = [
     priceLabel: "Standard, under 272K",
     notes:
       "Short-context standard rate for prompts under 272K tokens. The same pricing table lists long-context rates of $0.20 input, $0.02 cached input, and $0.75 output per 1M tokens. Batch and Flex are half of standard. Context window 1.05M and max output 128K are from the OpenAI API model list.",
+  },
+  {
+    slug: "gpt-6-rosalind",
+    provider: "OpenAI",
+    name: "GPT-6 Rosalind",
+    apiId: "gpt-6-rosalind",
+    weightsFrom: null,
+    inputUsdPerMillion: 15,
+    cachedInputUsdPerMillion: 1.5,
+    outputUsdPerMillion: 75,
+    contextTokens: null,
+    maxOutputTokens: null,
+    inputModalities: ["text", "image"],
+    outputModalities: ["text"],
+    releaseDate: "2026-10-30",
+    releaseMonth: null,
+    status: "limited",
+    sourceUrl: "https://developers.openai.com/api/docs/pricing",
+    limitsSourceUrl: null,
+    releaseSourceUrl: "https://developers.openai.com/api/docs/changelog",
+    updatedAt: checked,
+    priceLabel: "Standard, up to 272K, limited access",
+    notes:
+      "Specialized life-sciences model. Trusted access only: available to organizations approved for Rosalind Research; not generally available. Short-context standard rate for prompts of 272K tokens or fewer. The same pricing table lists long-context rates of $30 input, $3 cached input, and $112.50 output per 1M tokens for prompts over 272K tokens. Context window and max output were not published on the pages checked.",
   },
   {
     slug: "claude-fable-5-1",
@@ -412,23 +436,23 @@ export const models: Model[] = [
     name: "Mistral Medium 3.5",
     apiId: "mistral-medium-3-5",
     weightsFrom: null,
-    inputUsdPerMillion: 1.5,
-    cachedInputUsdPerMillion: 0.15,
-    outputUsdPerMillion: 7.5,
+    inputUsdPerMillion: null,
+    cachedInputUsdPerMillion: null,
+    outputUsdPerMillion: null,
     contextTokens: 256_000,
     maxOutputTokens: null,
     inputModalities: null,
     outputModalities: null,
     releaseDate: "2026-04-28",
     releaseMonth: null,
-    status: "active",
-    sourceUrl: "https://docs.mistral.ai/inference/pricing",
-    limitsSourceUrl: "https://docs.mistral.ai/models",
+    status: "deprecated",
+    sourceUrl: "https://docs.mistral.ai/models/mistral-medium-3-5-26-04",
+    limitsSourceUrl: "https://docs.mistral.ai/models/mistral-medium-3-5-26-04",
     releaseSourceUrl: "https://docs.mistral.ai/getting-started/changelog",
     updatedAt: checked,
-    priceLabel: "Standard",
+    priceLabel: "Not published",
     notes:
-      "Standard USD rates from the API pricing table. The models overview lists status GA and a 256k context window, and describes the model as multimodal. The changelog dates the release 28 April 2026. Max output and a modality list were not on the pages checked.",
+      "Deprecated by Mistral on 31 Oct 2026; retires 30 Apr 2027; replacement: Mistral Large 4. Mistral removed the price from its pricing page on deprecation. Last published list price (checked 30 Oct 2026): $1.50 input / $0.15 cached / $7.50 output per 1M tokens.",
   },
   {
     slug: "mistral-small-4",
@@ -460,23 +484,23 @@ export const models: Model[] = [
     name: "Mistral Large 3",
     apiId: "mistral-large-2512",
     weightsFrom: null,
-    inputUsdPerMillion: 0.5,
-    cachedInputUsdPerMillion: 0.05,
-    outputUsdPerMillion: 1.5,
+    inputUsdPerMillion: null,
+    cachedInputUsdPerMillion: null,
+    outputUsdPerMillion: null,
     contextTokens: 256_000,
     maxOutputTokens: null,
     inputModalities: null,
     outputModalities: null,
     releaseDate: null,
     releaseMonth: null,
-    status: "active",
-    sourceUrl: "https://docs.mistral.ai/inference/pricing",
-    limitsSourceUrl: "https://docs.mistral.ai/models",
+    status: "deprecated",
+    sourceUrl: "https://docs.mistral.ai/models/mistral-large-3-25-12",
+    limitsSourceUrl: "https://docs.mistral.ai/models/mistral-large-3-25-12",
     releaseSourceUrl: null,
     updatedAt: checked,
-    priceLabel: "Standard",
+    priceLabel: "Not published",
     notes:
-      "Standard USD rates from the API pricing table. The models overview lists status GA, a 256k context window, and describes the model as multimodal. A release day, max output, and a modality list were not on the pages checked.",
+      "Deprecated by Mistral on 31 Oct 2026; retires 30 Apr 2027; replacement: Mistral Large 4. Mistral removed the price from its pricing page on deprecation. Last published list price (checked 30 Oct 2026): $0.50 input / $0.05 cached / $1.50 output per 1M tokens.",
   },
   {
     slug: "glm-5-3-flash",
@@ -501,6 +525,30 @@ export const models: Model[] = [
     priceLabel: "Standard",
     notes:
       "Mistral-billed price for a Z.ai model, not a price billed by Z.ai. The model page publishes the context window as 1M tokens and max output as 128k, and lists status GA. The changelog dates the release 22 October 2026. A modality list was not on the pages checked.",
+  },
+  {
+    slug: "glm-5-3",
+    provider: "Mistral",
+    name: "GLM 5.3",
+    apiId: "zai-glm-5-3",
+    weightsFrom: "Z.ai",
+    inputUsdPerMillion: 1.4,
+    cachedInputUsdPerMillion: 0.14,
+    outputUsdPerMillion: 4.4,
+    contextTokens: 1_000_000,
+    maxOutputTokens: 128_000,
+    inputModalities: ["text"],
+    outputModalities: ["text"],
+    releaseDate: "2026-09-28",
+    releaseMonth: null,
+    status: "active",
+    sourceUrl: "https://docs.mistral.ai/models/zai-glm-5-3",
+    limitsSourceUrl: null,
+    releaseSourceUrl: "https://docs.mistral.ai/getting-started/changelog",
+    updatedAt: checked,
+    priceLabel: "Standard",
+    notes:
+      "Third-party open-weight model from Z.ai, hosted by Mistral without modifications. The model card lists a 1M context window, 128k max output, text input, text output, and status GA. The changelog dates general availability on Mistral to 28 September 2026. Also listed on the Mistral pricing page.",
   },
   {
     slug: "deepseek-flash",

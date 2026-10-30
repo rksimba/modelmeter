@@ -29,6 +29,9 @@ export function SiteFooter() {
           <Link href="/about" className="hover:text-ink">
             Methodology
           </Link>
+          <Link href="/faq" className="hover:text-ink">
+            FAQ
+          </Link>
           <Link href="/providers" className="hover:text-ink">
             All providers
           </Link>
