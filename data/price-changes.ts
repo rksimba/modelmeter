@@ -1,12 +1,17 @@
 /**
- * Dated changes to stored list prices, new models, and scheduled rates
- * that an official page has already published.
+ * Dated changes to stored list prices, including a price a provider removed,
+ * new models, and scheduled rates that an official page has already published.
  *
  * Rates are USD per 1M tokens. `oldRates` is null when the model was not
  * in the ledger before the entry. Do not add a row from memory or from
  * another tracker.
  */
-export type PriceChangeKind = "price cut" | "price increase" | "new model" | "scheduled change";
+export type PriceChangeKind =
+  | "price cut"
+  | "price increase"
+  | "price removed"
+  | "new model"
+  | "scheduled change";
 
 export type TokenRates = {
   inputUsdPerMillion: number | null;
@@ -30,6 +35,74 @@ export type PriceChange = {
 };
 
 export const priceChanges: PriceChange[] = [
+  {
+    date: "2026-10-31",
+    modelSlug: "mistral-medium-3-5",
+    provider: "Mistral",
+    kind: "price removed",
+    oldRates: {
+      inputUsdPerMillion: 1.5,
+      cachedInputUsdPerMillion: 0.15,
+      outputUsdPerMillion: 7.5,
+    },
+    newRates: {
+      inputUsdPerMillion: null,
+      cachedInputUsdPerMillion: null,
+      outputUsdPerMillion: null,
+    },
+    sourceUrl: "https://docs.mistral.ai/models/mistral-medium-3-5-26-04",
+    alsoSourceUrl: "https://docs.mistral.ai/inference/pricing",
+    note: "Mistral deprecated Mistral Medium 3.5 on 31 October 2026, with retirement on 30 April 2027 and Mistral Large 4 as the replacement, and removed the list price; the last published list price checked on 30 October 2026 was $1.50 input, $0.15 cached input, and $7.50 output per 1M tokens.",
+  },
+  {
+    date: "2026-10-31",
+    modelSlug: "mistral-large-3",
+    provider: "Mistral",
+    kind: "price removed",
+    oldRates: {
+      inputUsdPerMillion: 0.5,
+      cachedInputUsdPerMillion: 0.05,
+      outputUsdPerMillion: 1.5,
+    },
+    newRates: {
+      inputUsdPerMillion: null,
+      cachedInputUsdPerMillion: null,
+      outputUsdPerMillion: null,
+    },
+    sourceUrl: "https://docs.mistral.ai/models/mistral-large-3-25-12",
+    alsoSourceUrl: "https://docs.mistral.ai/inference/pricing",
+    note: "Mistral deprecated Mistral Large 3 on 31 October 2026, with retirement on 30 April 2027 and Mistral Large 4 as the replacement, and removed the list price; the last published list price checked on 30 October 2026 was $0.50 input, $0.05 cached input, and $1.50 output per 1M tokens.",
+  },
+  {
+    date: "2026-10-31",
+    modelSlug: "gpt-6-rosalind",
+    provider: "OpenAI",
+    kind: "new model",
+    oldRates: null,
+    newRates: {
+      inputUsdPerMillion: 15,
+      cachedInputUsdPerMillion: 1.5,
+      outputUsdPerMillion: 75,
+    },
+    sourceUrl: "https://developers.openai.com/api/docs/pricing",
+    alsoSourceUrl: "https://developers.openai.com/api/docs/changelog",
+    note: "OpenAI lists GPT-6 Rosalind, released 30 October 2026, at a short-context standard rate of $15 input, $1.50 cached input, and $75 output per 1M tokens for prompts up to 272K tokens, with access limited to organizations approved for Rosalind Research.",
+  },
+  {
+    date: "2026-10-31",
+    modelSlug: "glm-5-3",
+    provider: "Mistral",
+    kind: "new model",
+    oldRates: null,
+    newRates: {
+      inputUsdPerMillion: 1.4,
+      cachedInputUsdPerMillion: 0.14,
+      outputUsdPerMillion: 4.4,
+    },
+    sourceUrl: "https://docs.mistral.ai/models/zai-glm-5-3",
+    alsoSourceUrl: "https://mistral.ai/pricing",
+    note: "GLM 5.3 (zai-glm-5-3), a Z.ai open-weight model hosted by Mistral without modifications, is $1.40 input, $0.14 cached input, and $4.40 output per 1M tokens; general availability on Mistral is 28 September 2026, and this row was added to the ledger on 31 October 2026.",
+  },
   {
     date: "2026-10-29",
     modelSlug: "mistral-large-4",

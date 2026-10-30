@@ -3,6 +3,7 @@ import { comparisonPairs, sameTierRuleSentence } from "@/lib/comparisons";
 import { formatModalities, formatRate, formatRelease, formatTokens, formatUsd, formatUsdExact, statusLabel } from "@/lib/format";
 import { priceChangesPlainText } from "@/lib/price-changes";
 import { SAMPLE_WORKLOAD, estimateCost } from "@/lib/pricing";
+import { faqsPlainText, pageFaqs } from "@/lib/faq";
 import { indexablePaths } from "@/lib/routes";
 import { absoluteUrl } from "@/lib/metadata";
 import { methodologyParagraphs, siteConfig } from "@/lib/site";
@@ -84,6 +85,7 @@ export function llmsFullTxt(): string {
       (entry) => `- ${entry.title}: ${absoluteUrl(entry.path)} — ${entry.summary}`,
     ),
     "",
+    faqsPlainText(pageFaqs()),
     "## Same-tier comparisons",
     sameTierRuleSentence(),
     `Sample workload: ${SAMPLE_WORKLOAD.inputTokens} input tokens, ${SAMPLE_WORKLOAD.outputTokens} output tokens, ${SAMPLE_WORKLOAD.requestsPerMonth} requests per month. Costs use the stored input and output rates only.`,

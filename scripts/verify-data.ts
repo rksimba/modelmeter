@@ -32,10 +32,11 @@ const OFFICIAL_HOSTS = new Set([
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const ISO_MONTH = /^\d{4}-\d{2}$/;
-const STATUSES = new Set<ModelStatus>(["active", "preview", "legacy", "limited"]);
+const STATUSES = new Set<ModelStatus>(["active", "preview", "legacy", "limited", "deprecated"]);
 const PRICE_CHANGE_KINDS = new Set<PriceChangeKind>([
   "price cut",
   "price increase",
+  "price removed",
   "new model",
   "scheduled change",
 ]);

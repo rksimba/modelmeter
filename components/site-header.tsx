@@ -11,6 +11,7 @@ const links = [
   { href: "/releases", label: "Releases" },
   { href: "/price-changes", label: "Price changes" },
   { href: "/about", label: "About" },
+  { href: "/faq", label: "FAQ" },
 ];
 
 export function SiteHeader() {

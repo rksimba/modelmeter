@@ -45,6 +45,13 @@ export function indexablePaths(): IndexablePath[] {
       summary: "How prices are copied from official provider pages, with a source link and a check date on every row.",
     },
     {
+      path: "/faq",
+      lastModified: checked,
+      title: "FAQ",
+      summary:
+        "How prices are sourced, what n/a and the rate labels mean, and how to follow changes. Answers are generated from the ledger.",
+    },
+    {
       path: "/sponsor",
       lastModified: checked,
       title: "Sponsor",

@@ -15,6 +15,8 @@ export function priceChangeKindLabel(kind: PriceChangeKind): string {
       return "Price cut";
     case "price increase":
       return "Price increase";
+    case "price removed":
+      return "Price removed";
     case "new model":
       return "New model";
     case "scheduled change":

@@ -103,5 +103,6 @@ export function statusLabel(status: Model["status"]): string {
   if (status === "preview") return "Preview";
   if (status === "legacy") return "Legacy";
   if (status === "limited") return "Limited access";
+  if (status === "deprecated") return "Deprecated";
   return "Active";
 }
