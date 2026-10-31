@@ -7,6 +7,7 @@ import { RateList } from "@/components/rate-list";
 import { comparisonsForProvider } from "@/lib/comparisons";
 import { formatIsoDate } from "@/lib/format";
 import { latestUpdate, modelsByProvider, providerFromSlug, providerSlug, providers } from "@/lib/models";
+import { providerMarkdownPath } from "@/lib/markdown";
 import { pageMetadata } from "@/lib/metadata";
 import { breadcrumbNode, jsonLdGraph, modelItemListNode } from "@/lib/structured-data";
 
@@ -30,6 +31,7 @@ export async function generateMetadata({
     title: `${provider} API prices`,
     description: `${provider} API list prices on ModelMeter: ${rows.length} ${rows.length === 1 ? "model" : "models"}, USD per 1M tokens, each linked to the official source. Last checked ${formatIsoDate(checked)}.`,
     path: `/providers/${slug}`,
+    markdownPath: providerMarkdownPath(slug),
   });
 }
 

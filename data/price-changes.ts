@@ -36,6 +36,21 @@ export type PriceChange = {
 
 export const priceChanges: PriceChange[] = [
   {
+    date: "2026-11-01",
+    modelSlug: "deepseek-v4-1-flash-1017",
+    provider: "Mistral",
+    kind: "new model",
+    oldRates: null,
+    newRates: {
+      inputUsdPerMillion: 0.3,
+      cachedInputUsdPerMillion: 0.007,
+      outputUsdPerMillion: 1.2,
+    },
+    sourceUrl: "https://docs.mistral.ai/models/deepseek-v4-flash-1017",
+    alsoSourceUrl: null,
+    note: "DeepSeek V4.1 Flash 1017 (deepseek-v4-1-flash-1017), a DeepSeek open-weight model hosted by Mistral without modifications, is $0.30 input, $0.007 cached input, and $1.20 output per 1M tokens; the Mistral model card lists Public Preview and a release date of 28 October 2026, and this row was added to the ledger on 1 November 2026.",
+  },
+  {
     date: "2026-10-31",
     modelSlug: "mistral-medium-3-5",
     provider: "Mistral",

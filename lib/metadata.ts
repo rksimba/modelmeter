@@ -27,11 +27,14 @@ export function pageMetadata({
   description,
   path,
   absoluteTitle = false,
+  markdownPath,
 }: {
   title: string;
   description: string;
   path: string;
   absoluteTitle?: boolean;
+  /** Public Markdown URL for this page, when one exists. */
+  markdownPath?: string;
 }): Metadata {
   const canonical = absoluteUrl(path);
   const socialTitle = absoluteTitle ? title : `${title} · ${siteConfig.name}`;
@@ -44,6 +47,9 @@ export function pageMetadata({
         "text/plain": [{ url: "/llms.txt", title: "llms.txt" }],
         "application/json": [{ url: "/api/models.json", title: "Model dataset" }],
         "application/rss+xml": [{ url: "/price-changes.xml", title: "AI API price changes" }],
+        ...(markdownPath
+          ? { "text/markdown": [{ url: markdownPath, title: "Markdown" }] }
+          : {}),
       },
     },
     openGraph: {
