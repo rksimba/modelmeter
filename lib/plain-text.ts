@@ -4,9 +4,16 @@ import { formatModalities, formatRate, formatRelease, formatTokens, formatUsd, f
 import { priceChangesPlainText } from "@/lib/price-changes";
 import { SAMPLE_WORKLOAD, estimateCost } from "@/lib/pricing";
 import { faqsPlainText, pageFaqs } from "@/lib/faq";
-import { indexablePaths } from "@/lib/routes";
+import { markdownAlternatePath, markdownVersionsSentence, modelMarkdownPath } from "@/lib/markdown";
+import { indexablePaths, type IndexablePath } from "@/lib/routes";
 import { absoluteUrl } from "@/lib/metadata";
 import { methodologyParagraphs, siteConfig } from "@/lib/site";
+
+function pageIndexLine(entry: IndexablePath): string {
+  const markdownPath = markdownAlternatePath(entry.path);
+  const markdown = markdownPath ? ` Markdown: ${absoluteUrl(markdownPath)}` : "";
+  return `- ${entry.title}: ${absoluteUrl(entry.path)} — ${entry.summary}${markdown}`;
+}
 
 function rowLine(model: (typeof models)[number]): string {
   const cached =
@@ -38,18 +45,19 @@ export function llmsTxt(): string {
     "## Pages",
     ...indexablePaths()
       .filter((entry) => !entry.path.startsWith("/models/"))
-      .map((entry) => `- ${entry.title}: ${absoluteUrl(entry.path)} — ${entry.summary}`),
+      .map((entry) => pageIndexLine(entry)),
     "",
     "## Dataset",
     `Checked: ${DATASET_CHECKED_ON}`,
     `Models: ${models.length}`,
     `JSON: ${absoluteUrl("/api/models.json")}`,
     `Full text: ${absoluteUrl("/llms-full.txt")}`,
+    markdownVersionsSentence,
     "",
     "## Models",
     ...models.map(
       (model) =>
-        `- ${model.provider} — ${model.name}: input ${formatRate(model.inputUsdPerMillion)}, cached ${formatRate(model.cachedInputUsdPerMillion)}, output ${formatRate(model.outputUsdPerMillion)} per 1M tokens (${model.priceLabel}). Source: ${model.sourceUrl}`,
+        `- ${model.provider} — ${model.name}: input ${formatRate(model.inputUsdPerMillion)}, cached ${formatRate(model.cachedInputUsdPerMillion)}, output ${formatRate(model.outputUsdPerMillion)} per 1M tokens (${model.priceLabel}). Source: ${model.sourceUrl} Markdown: ${absoluteUrl(modelMarkdownPath(model.slug))}`,
     ),
     "",
     "ModelMeter does not sell API access. Sponsored placements and affiliate links are switched off.",
@@ -67,6 +75,7 @@ export function llmsFullTxt(): string {
       model.releaseSourceUrl ? `Release source: ${model.releaseSourceUrl}` : null,
       `Note: ${model.notes}`,
       `Page: ${absoluteUrl(`/models/${model.slug}`)}`,
+      `Markdown: ${absoluteUrl(modelMarkdownPath(model.slug))}`,
     ]
       .filter(Boolean)
       .join("\n"),
@@ -79,11 +88,10 @@ export function llmsFullTxt(): string {
     ...methodologyParagraphs,
     "",
     "Rates are USD per 1 million tokens. n/a means the official page did not publish that value.",
+    markdownVersionsSentence,
     "",
     "## Pages",
-    ...indexablePaths().map(
-      (entry) => `- ${entry.title}: ${absoluteUrl(entry.path)} — ${entry.summary}`,
-    ),
+    ...indexablePaths().map((entry) => pageIndexLine(entry)),
     "",
     faqsPlainText(pageFaqs()),
     "## Same-tier comparisons",

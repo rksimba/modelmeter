@@ -6,7 +6,7 @@
  * on DATASET_CHECKED_ON. Do not fill gaps from memory or from other trackers.
  * If a provider has not published a value, leave it null.
  */
-export const DATASET_CHECKED_ON = "2026-10-31";
+export const DATASET_CHECKED_ON = "2026-11-01";
 
 export type ModelStatus = "active" | "preview" | "legacy" | "limited" | "deprecated";
 
@@ -551,6 +551,30 @@ export const models: Model[] = [
       "Third-party open-weight model from Z.ai, hosted by Mistral without modifications. The model card lists a 1M context window, 128k max output, text input, text output, and status GA. The changelog dates general availability on Mistral to 28 September 2026. Also listed on the Mistral pricing page.",
   },
   {
+    slug: "deepseek-v4-1-flash-1017",
+    provider: "Mistral",
+    name: "DeepSeek V4.1 Flash 1017",
+    apiId: "deepseek-v4-1-flash-1017",
+    weightsFrom: "DeepSeek",
+    inputUsdPerMillion: 0.3,
+    cachedInputUsdPerMillion: 0.007,
+    outputUsdPerMillion: 1.2,
+    contextTokens: 1_000_000,
+    maxOutputTokens: 128_000,
+    inputModalities: ["text", "image"],
+    outputModalities: ["text"],
+    releaseDate: "2026-10-28",
+    releaseMonth: null,
+    status: "preview",
+    sourceUrl: "https://docs.mistral.ai/models/deepseek-v4-flash-1017",
+    limitsSourceUrl: "https://docs.mistral.ai/models/deepseek-v4-flash-1017",
+    releaseSourceUrl: "https://docs.mistral.ai/models/deepseek-v4-flash-1017",
+    updatedAt: checked,
+    priceLabel: "Standard",
+    notes:
+      "Third-party open-weight model from DeepSeek (MIT), hosted by Mistral without modifications. The Mistral model card lists Public Preview, a 1M context window, 128k max output, text and image input, and $0.30 input, $0.007 cached input, $1.20 output per 1M tokens; the same rates are on the Mistral pricing page. This is the same model version DeepSeek serves as deepseek-flash on its own API, where it is billed at different peak and off-peak rates.",
+  },
+  {
     slug: "deepseek-flash",
     provider: "DeepSeek",
     name: "DeepSeek Flash",
@@ -782,12 +806,12 @@ export const models: Model[] = [
     releaseDate: "2026-10-23",
     releaseMonth: null,
     status: "active",
-    sourceUrl: "https://platform.kimi.ai/",
+    sourceUrl: "https://platform.kimi.ai/docs/pricing/chat",
     limitsSourceUrl: "https://platform.kimi.ai/docs/guide/kimi-k3-1-pro-quickstart",
     releaseSourceUrl: "https://forum.moonshot.ai/c/announcement/5",
     updatedAt: checked,
     priceLabel: "Cache miss / cache hit / output",
     notes:
-      "The platform home lists these rates: cache-miss input, cache-hit input, and output. Cache writes are billed separately at $2 per 1M tokens for a 5-minute TTL and $4 per 1M tokens for a 1-hour TTL. A Highspeed variant, kimi-k3.1-pro-highspeed, is $4 input, $0.20 cached input, and $20 output per 1M tokens. The quickstart sets max_completion_tokens to 131,072 by default and allows it up to 1,048,576, which is the max output recorded here. The docs pricing table renders client-side, so the stored rates are the ones on the platform home. Open weights are promised by 4 November 2026.",
+      "The docs pricing table lists these rates: cache-miss input, cache-hit input, and output. Cache writes are billed separately at $2 per 1M tokens for a 5-minute TTL and $4 per 1M tokens for a 1-hour TTL. A Highspeed variant, kimi-k3.1-pro-highspeed, is $4 input, $0.20 cached input, and $20 output per 1M tokens. The quickstart sets max_completion_tokens to 131,072 by default and allows it up to 1,048,576, which is the max output recorded here. The docs pricing table renders client-side, and the stored rates are the ones on that table. Open weights are promised by 4 November 2026.",
   },
 ];

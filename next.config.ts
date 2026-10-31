@@ -13,6 +13,20 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async rewrites() {
+    // A ".md" suffix cannot be a dynamic segment next to the HTML page, so
+    // these run before dynamic routes and keep /models/:slug and /providers/:slug.
+    return [
+      {
+        source: "/models/:slug.md",
+        destination: "/api/md/models/:slug",
+      },
+      {
+        source: "/providers/:provider.md",
+        destination: "/api/md/providers/:provider",
+      },
+    ];
+  },
   turbopack: {
     rules: {
       "*.css": {

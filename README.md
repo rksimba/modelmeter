@@ -51,7 +51,7 @@ npm run build
 
 8. Commit the data change and push. Vercel rebuilds the static pages from the file.
 
-The calculator, provider pages, same-tier comparisons, cheapest and context rankings, `/sitemap.xml`, `/api/models.json`, `/llms.txt`, and `/llms-full.txt` all read `data/models.ts`. You do not update them separately. `/price-changes`, `/price-changes.xml`, and the price-change section of `/llms-full.txt` read `data/price-changes.ts`.
+The calculator, provider pages, same-tier comparisons, cheapest and context rankings, `/sitemap.xml`, `/api/models.json`, `/llms.txt`, `/llms-full.txt`, and the per-model and per-provider Markdown pages all read `data/models.ts`. You do not update them separately. `/price-changes`, `/price-changes.xml`, and the price-change section of `/llms-full.txt` read `data/price-changes.ts`.
 
 `sitemap.xml` sets `lastmod` from each row’s `updatedAt` on model pages, from the latest `updatedAt` among a provider’s rows on provider pages, from the later of the two rows on a comparison, and from `DATASET_CHECKED_ON` on the other pages. Set `NEXT_PUBLIC_SITE_URL` to the public origin (for example `https://modelmeter.live`) so canonical URLs, Open Graph URLs, the sitemap, and `llms.txt` use that host. Without it, a Vercel production build uses `VERCEL_PROJECT_PRODUCTION_URL`.
 
@@ -80,10 +80,12 @@ Prices are USD per 1 million tokens. The number is the specific rate named in `p
 | `/price-changes.xml` | RSS 2.0 feed of those entries |
 | `/models` | Every model in the ledger, with its stored rate and a link to the model page |
 | `/models/[slug]` | One model, its rate, limits, source, updated date, and related links |
+| `/models/[slug].md` | Plain Markdown for that model. Unknown slugs return 404. Not listed in the sitemap |
+| `/providers/[provider].md` | Plain Markdown for that provider. Unknown slugs return 404. Not listed in the sitemap |
 | `/about` | Methodology and a newsletter form |
 | `/sponsor` | Placeholder. No packages or terms |
 | `/api/models.json` | Full dataset. `/models.json` permanently redirects here (HTTP 308) |
-| `/llms.txt`, `/llms-full.txt` | Plain-text summary for chatbots, including the pages above |
+| `/llms.txt`, `/llms-full.txt` | Plain-text summary for chatbots, including the pages above. Model and provider entries also link to the `.md` pages |
 | `/sitemap.xml` | Those pages, with `lastmod` from the ledger dates |
 | `/api/subscribe` | Stores a newsletter contact in Resend. Sends no email. Returns 501 when `RESEND_API_KEY` or `RESEND_SEGMENT_ID` is missing. |
 

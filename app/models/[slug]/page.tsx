@@ -14,6 +14,7 @@ import {
   formatTokens,
 } from "@/lib/format";
 import { modelsByProvider, providerSlug } from "@/lib/models";
+import { modelMarkdownPath } from "@/lib/markdown";
 import { absoluteUrl, pageMetadata } from "@/lib/metadata";
 import { siteConfig } from "@/lib/site";
 import { breadcrumbNode, jsonLdGraph } from "@/lib/structured-data";
@@ -37,6 +38,7 @@ export async function generateMetadata({
     title: `${model.name} API price`,
     description,
     path: `/models/${model.slug}`,
+    markdownPath: modelMarkdownPath(model.slug),
   });
 }
 

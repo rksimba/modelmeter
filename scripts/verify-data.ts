@@ -1,8 +1,20 @@
 import { DATASET_CHECKED_ON, models, type Model, type ModelStatus } from "../data/models";
 import { priceChanges, type PriceChangeKind } from "../data/price-changes";
 import { comparisonPairs } from "../lib/comparisons";
+import { pageFaqs } from "../lib/faq";
+import {
+  markdownAlternatePath,
+  markdownVersionsSentence,
+  modelMarkdownDocument,
+  modelMarkdownPath,
+  providerMarkdownDocument,
+  providerMarkdownPath,
+} from "../lib/markdown";
 import { providerSlug, providers } from "../lib/models";
+import { absoluteUrl } from "../lib/metadata";
+import { llmsFullTxt, llmsTxt } from "../lib/plain-text";
 import { modelIsPriced, estimateCost } from "../lib/pricing";
+import { indexablePaths } from "../lib/routes";
 
 const OFFICIAL_HOSTS = new Set([
   "openai.com",
@@ -201,7 +213,139 @@ for (const change of priceChanges) {
   }
 }
 
+const deepseek = models.find((model) => model.slug === "deepseek-v4-1-flash-1017");
+if (!deepseek) {
+  errors.push("Expected deepseek-v4-1-flash-1017 in the dataset");
+} else {
+  if (deepseek.provider !== "Mistral") errors.push("deepseek-v4-1-flash-1017 provider must be Mistral");
+  if (deepseek.name !== "DeepSeek V4.1 Flash 1017") errors.push("deepseek-v4-1-flash-1017 name mismatch");
+  if (deepseek.apiId !== "deepseek-v4-1-flash-1017") errors.push("deepseek-v4-1-flash-1017 apiId mismatch");
+  if (deepseek.weightsFrom !== "DeepSeek") errors.push("deepseek-v4-1-flash-1017 weightsFrom mismatch");
+  if (deepseek.inputUsdPerMillion !== 0.3) errors.push("deepseek-v4-1-flash-1017 input rate mismatch");
+  if (deepseek.cachedInputUsdPerMillion !== 0.007) errors.push("deepseek-v4-1-flash-1017 cached rate mismatch");
+  if (deepseek.outputUsdPerMillion !== 1.2) errors.push("deepseek-v4-1-flash-1017 output rate mismatch");
+  if (deepseek.priceLabel !== "Standard") errors.push("deepseek-v4-1-flash-1017 priceLabel mismatch");
+  if (deepseek.contextTokens !== 1_000_000) errors.push("deepseek-v4-1-flash-1017 context mismatch");
+  if (deepseek.maxOutputTokens !== 128_000) errors.push("deepseek-v4-1-flash-1017 max output mismatch");
+  if (deepseek.status !== "preview") errors.push("deepseek-v4-1-flash-1017 status mismatch");
+  if (deepseek.releaseDate !== "2026-10-28") errors.push("deepseek-v4-1-flash-1017 releaseDate mismatch");
+  const source = "https://docs.mistral.ai/models/deepseek-v4-flash-1017";
+  if (deepseek.sourceUrl !== source || deepseek.limitsSourceUrl !== source || deepseek.releaseSourceUrl !== source) {
+    errors.push("deepseek-v4-1-flash-1017 source URLs mismatch");
+  }
+  if (!deepseek.inputModalities?.includes("text") || !deepseek.inputModalities?.includes("image")) {
+    errors.push("deepseek-v4-1-flash-1017 input modalities mismatch");
+  }
+  if (deepseek.outputModalities?.join(",") !== "text") {
+    errors.push("deepseek-v4-1-flash-1017 output modalities mismatch");
+  }
+  const added = priceChanges.find(
+    (change) => change.modelSlug === deepseek.slug && change.date === "2026-11-01" && change.kind === "new model",
+  );
+  if (!added) errors.push("deepseek-v4-1-flash-1017 is missing its 2026-11-01 new model price change");
+  else if (added.newRates.inputUsdPerMillion !== 0.3 || added.newRates.cachedInputUsdPerMillion !== 0.007 || added.newRates.outputUsdPerMillion !== 1.2) {
+    errors.push("deepseek-v4-1-flash-1017 price change rates mismatch");
+  } else if (added.sourceUrl !== source) {
+    errors.push("deepseek-v4-1-flash-1017 price change source mismatch");
+  }
+}
+
+const kimi = models.find((model) => model.slug === "kimi-k3-1-pro");
+if (!kimi) {
+  errors.push("Expected kimi-k3-1-pro in the dataset");
+} else {
+  if (kimi.sourceUrl !== "https://platform.kimi.ai/docs/pricing/chat") {
+    errors.push("kimi-k3-1-pro sourceUrl must be the docs pricing table");
+  }
+  if (kimi.inputUsdPerMillion !== 2 || kimi.cachedInputUsdPerMillion !== 0.2 || kimi.outputUsdPerMillion !== 10) {
+    errors.push("kimi-k3-1-pro stored rates changed");
+  }
+  if (/platform home/i.test(kimi.notes)) errors.push("kimi-k3-1-pro notes still cite the platform home");
+  if (!kimi.notes.includes("docs pricing table")) errors.push("kimi-k3-1-pro notes must cite the docs pricing table");
+}
+
+const markdownPaths = new Set<string>();
+for (const model of models) {
+  const body = modelMarkdownDocument(model.slug);
+  const path = modelMarkdownPath(model.slug);
+  markdownPaths.add(path);
+  if (!body) {
+    errors.push(`${model.slug} markdown document is missing`);
+    continue;
+  }
+  if (!body.startsWith(`# ${model.provider} ${model.name} API price\n`)) {
+    errors.push(`${model.slug} markdown heading mismatch`);
+  }
+  if (!body.includes(`Checked: ${model.updatedAt}`)) errors.push(`${model.slug} markdown is missing Checked`);
+  if (!body.includes(`Canonical page: ${absoluteUrl(`/models/${model.slug}`)}`)) {
+    errors.push(`${model.slug} markdown is missing the canonical page`);
+  }
+  if (!body.includes(`Dataset: ${absoluteUrl("/api/models.json")}`)) {
+    errors.push(`${model.slug} markdown is missing the dataset link`);
+  }
+  if (model.inputUsdPerMillion === null && !body.includes("Input: n/a")) {
+    errors.push(`${model.slug} markdown should show n/a input`);
+  }
+  if (model.weightsFrom && !body.includes(`Weights from: ${model.weightsFrom}`)) {
+    errors.push(`${model.slug} markdown is missing weights from`);
+  }
+  if (!model.weightsFrom && body.includes("Weights from:")) {
+    errors.push(`${model.slug} markdown includes weights from`);
+  }
+}
+if (modelMarkdownDocument("not-a-model") !== null) errors.push("Unknown model markdown must be null");
+
+for (const provider of providers()) {
+  const slug = providerSlug(provider);
+  const body = providerMarkdownDocument(slug);
+  const path = providerMarkdownPath(slug);
+  markdownPaths.add(path);
+  if (!body) {
+    errors.push(`${slug} provider markdown document is missing`);
+    continue;
+  }
+  if (!body.startsWith(`# ${provider} API prices\n`)) errors.push(`${slug} provider markdown heading mismatch`);
+  if (!body.includes("Checked:")) errors.push(`${slug} provider markdown is missing Checked`);
+  for (const model of models.filter((row) => row.provider === provider)) {
+    if (!body.includes(absoluteUrl(modelMarkdownPath(model.slug)))) {
+      errors.push(`${slug} provider markdown is missing ${model.slug}`);
+    }
+    if (!body.includes(model.sourceUrl)) errors.push(`${slug} provider markdown is missing a source for ${model.slug}`);
+  }
+}
+if (providerMarkdownDocument("not-a-provider") !== null) errors.push("Unknown provider markdown must be null");
+
+for (const entry of indexablePaths()) {
+  if (entry.path.endsWith(".md") || entry.path.includes("/api/md/")) {
+    errors.push(`Sitemap path includes a Markdown route: ${entry.path}`);
+  }
+}
+
+const llms = llmsTxt();
+const llmsFull = llmsFullTxt();
+if (!llms.includes(markdownVersionsSentence) || !llmsFull.includes(markdownVersionsSentence)) {
+  errors.push("llms.txt and llms-full.txt must explain the Markdown pages");
+}
+for (const model of models) {
+  const url = absoluteUrl(modelMarkdownPath(model.slug));
+  if (!llms.includes(`Markdown: ${url}`)) errors.push(`llms.txt models list is missing ${url}`);
+}
+for (const provider of providers()) {
+  const url = absoluteUrl(providerMarkdownPath(providerSlug(provider)));
+  if (!llms.includes(`Markdown: ${url}`)) errors.push(`llms.txt provider pages are missing ${url}`);
+  if (!llmsFull.includes(`Markdown: ${url}`)) errors.push(`llms-full.txt provider pages are missing ${url}`);
+}
+const machineReadable = pageFaqs().find((item) => item.answer.includes("/api/models.json"));
+if (!machineReadable?.answer.includes(markdownVersionsSentence)) {
+  errors.push("The machine-readable FAQ answer must mention Markdown pages");
+}
+if (markdownAlternatePath("/models") !== null || markdownAlternatePath("/providers") !== null) {
+  errors.push("Index pages must not grow a Markdown alternate");
+}
+
 console.log(`ModelMeter dataset check — ${models.length} rows, ledger date ${DATASET_CHECKED_ON}`);
+console.log(`Providers: ${providers().length}`);
+console.log(`Markdown routes: ${markdownPaths.size}`);
 console.log(`Comparison pairs: ${pairs.length}`);
 console.log(`Price changes: ${priceChanges.length}`);
 for (const warning of warnings) console.warn(`WARN ${warning}`);

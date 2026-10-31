@@ -3,6 +3,7 @@ import { formatIsoDate, formatRate, formatTokens, formatUsd, statusLabel } from 
 import { methodologyParagraphs, siteConfig } from "@/lib/site";
 import { getSiteUrl } from "@/lib/site-url";
 import { CALCULATOR_DEFAULTS, DAYS_PER_MONTH, SAMPLE_WORKLOAD, estimateCost } from "@/lib/pricing";
+import { markdownVersionsSentence } from "@/lib/markdown";
 import { getModel } from "@/lib/models";
 
 export type FaqItem = {
@@ -213,7 +214,7 @@ export function pageFaqs(): FaqItem[] {
     },
     {
       question: "How do I follow price changes?",
-      answer: `Dated price changes, new models, and scheduled rates are at ${origin}/price-changes. The RSS feed is ${origin}/price-changes.xml. Machine-readable rows for the whole ledger are at ${origin}/api/models.json.`,
+      answer: `Dated price changes, new models, and scheduled rates are at ${origin}/price-changes. The RSS feed is ${origin}/price-changes.xml. Machine-readable rows for the whole ledger are at ${origin}/api/models.json. ${markdownVersionsSentence}`,
     },
     {
       question: "Are any listings sponsored?",
