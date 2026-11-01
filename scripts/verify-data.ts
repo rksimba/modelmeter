@@ -4,17 +4,28 @@ import { comparisonPairs } from "../lib/comparisons";
 import { pageFaqs } from "../lib/faq";
 import {
   markdownAlternatePath,
+  markdownResponse,
   markdownVersionsSentence,
   modelMarkdownDocument,
   modelMarkdownPath,
   providerMarkdownDocument,
   providerMarkdownPath,
 } from "../lib/markdown";
+import { HUB_MARKDOWN_PAGES } from "../lib/markdown-paths";
+import {
+  comparePairMarkdownDocument,
+  hubPageMarkdown,
+  indexMarkdownDocument,
+  priceChangesMarkdownDocument,
+  releasesMarkdownDocument,
+} from "../lib/markdown-pages";
+import { modelsInHomeTableOrder } from "../lib/model-sort";
 import { providerSlug, providers } from "../lib/models";
 import { absoluteUrl } from "../lib/metadata";
 import { llmsFullTxt, llmsTxt } from "../lib/plain-text";
 import { modelIsPriced, estimateCost } from "../lib/pricing";
 import { indexablePaths } from "../lib/routes";
+import { methodologyParagraphs } from "../lib/site";
 
 const OFFICIAL_HOSTS = new Set([
   "openai.com",
@@ -40,6 +51,8 @@ const OFFICIAL_HOSTS = new Set([
   "about.fb.com",
   "platform.kimi.ai",
   "forum.moonshot.ai",
+  "www.alibabacloud.com",
+  "docs.modelstudio.console.alibabacloud.com",
 ]);
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -123,6 +136,9 @@ for (const model of models) {
     if (age > WEEK_MS) {
       warnings.push(`${model.slug} was last updated ${model.updatedAt}, which is older than 7 days`);
     }
+  }
+  if (model.updatedAt !== DATASET_CHECKED_ON) {
+    errors.push(`${model.slug} updatedAt ${model.updatedAt} does not match the ledger check date ${DATASET_CHECKED_ON}`);
   }
 }
 
@@ -264,6 +280,46 @@ if (!kimi) {
   if (!kimi.notes.includes("docs pricing table")) errors.push("kimi-k3-1-pro notes must cite the docs pricing table");
 }
 
+const qwen = models.find((model) => model.slug === "qwen3-8-max");
+if (!qwen) {
+  errors.push("Expected qwen3-8-max in the dataset");
+} else {
+  if (qwen.provider !== "Alibaba Cloud") errors.push("qwen3-8-max provider must be Alibaba Cloud");
+  if (qwen.name !== "Qwen3.8-Max") errors.push("qwen3-8-max name mismatch");
+  if (qwen.apiId !== "qwen3.8-max") errors.push("qwen3-8-max apiId mismatch");
+  if (qwen.weightsFrom !== "Alibaba (Qwen)") errors.push("qwen3-8-max weightsFrom mismatch");
+  if (qwen.inputUsdPerMillion !== 2) errors.push("qwen3-8-max input rate mismatch");
+  if (qwen.cachedInputUsdPerMillion !== 0.25) errors.push("qwen3-8-max cached rate mismatch");
+  if (qwen.outputUsdPerMillion !== 6) errors.push("qwen3-8-max output rate mismatch");
+  if (qwen.contextTokens !== 1_000_000) errors.push("qwen3-8-max context mismatch");
+  if (qwen.maxOutputTokens !== 131_072) errors.push("qwen3-8-max max output mismatch");
+  if (qwen.status !== "active") errors.push("qwen3-8-max status mismatch");
+  if (qwen.releaseDate !== null || qwen.releaseMonth !== null) errors.push("qwen3-8-max release must be unpublished");
+  if (qwen.priceLabel !== "Standard, International (Singapore) scope") errors.push("qwen3-8-max priceLabel mismatch");
+  if (qwen.inputModalities?.join(",") !== "text,image,video") errors.push("qwen3-8-max input modalities mismatch");
+  if (qwen.outputModalities?.join(",") !== "text") errors.push("qwen3-8-max output modalities mismatch");
+  if (qwen.sourceUrl !== "https://www.alibabacloud.com/help/en/model-studio/model-pricing") {
+    errors.push("qwen3-8-max sourceUrl mismatch");
+  }
+  if (qwen.limitsSourceUrl !== "https://docs.modelstudio.console.alibabacloud.com/en/model-studio/qwen3-8-max") {
+    errors.push("qwen3-8-max limitsSourceUrl mismatch");
+  }
+  if (qwen.releaseSourceUrl !== null) errors.push("qwen3-8-max releaseSourceUrl must be null");
+  if (qwen.updatedAt !== DATASET_CHECKED_ON) errors.push("qwen3-8-max updatedAt must match the ledger check date");
+  const added = priceChanges.find(
+    (change) => change.modelSlug === qwen.slug && change.date === "2026-11-02" && change.kind === "new model",
+  );
+  if (!added) errors.push("qwen3-8-max is missing its 2026-11-02 new model price change");
+  else if (added.oldRates !== null) errors.push("qwen3-8-max price change must have null old rates");
+  else if (added.newRates.inputUsdPerMillion !== 2 || added.newRates.cachedInputUsdPerMillion !== 0.25 || added.newRates.outputUsdPerMillion !== 6) {
+    errors.push("qwen3-8-max price change rates mismatch");
+  } else if (added.sourceUrl !== qwen.sourceUrl) {
+    errors.push("qwen3-8-max price change source mismatch");
+  } else if (added.provider !== "Alibaba Cloud") {
+    errors.push("qwen3-8-max price change provider mismatch");
+  }
+}
+
 const markdownPaths = new Set<string>();
 for (const model of models) {
   const body = modelMarkdownDocument(model.slug);
@@ -339,9 +395,125 @@ const machineReadable = pageFaqs().find((item) => item.answer.includes("/api/mod
 if (!machineReadable?.answer.includes(markdownVersionsSentence)) {
   errors.push("The machine-readable FAQ answer must mention Markdown pages");
 }
-if (markdownAlternatePath("/models") !== null || markdownAlternatePath("/providers") !== null) {
-  errors.push("Index pages must not grow a Markdown alternate");
+if (!llmsFull.includes("Hub and list pages also have Markdown versions")) {
+  errors.push("llms-full.txt must say hub pages have Markdown versions");
 }
+for (const htmlPath of ["/calculator", "/about", "/sponsor"]) {
+  if (markdownAlternatePath(htmlPath) !== null) {
+    errors.push(`${htmlPath} must not grow a Markdown alternate`);
+  }
+}
+
+function markdownTableRows(body: string): string[][] {
+  return body
+    .split("\n")
+    .filter((line) => line.startsWith("| ") && !line.startsWith("| ---"))
+    .slice(1)
+    .map((line) => line.split("|").slice(1, -1).map((cell) => cell.trim()));
+}
+
+for (const entry of HUB_MARKDOWN_PAGES) {
+  markdownPaths.add(entry.markdownPath);
+  const body = hubPageMarkdown(entry.page);
+  if (!body) {
+    errors.push(`${entry.markdownPath} document is missing`);
+    continue;
+  }
+  if (!body.startsWith("# ")) errors.push(`${entry.markdownPath} is missing a heading`);
+  if (!body.includes(`Checked: ${DATASET_CHECKED_ON}`)) errors.push(`${entry.markdownPath} is missing Checked`);
+  if (markdownAlternatePath(entry.htmlPath) !== entry.markdownPath) {
+    errors.push(`${entry.htmlPath} Markdown alternate does not match ${entry.markdownPath}`);
+  }
+  const url = absoluteUrl(entry.markdownPath);
+  if (!llms.includes(`Markdown: ${url}`)) errors.push(`llms.txt is missing ${url}`);
+  if (!llmsFull.includes(`Markdown: ${url}`)) errors.push(`llms-full.txt is missing ${url}`);
+}
+if (hubPageMarkdown("not-a-page") !== null) errors.push("Unknown hub markdown must be null");
+const providersBody = hubPageMarkdown("providers") ?? "";
+if (!providersBody.includes(absoluteUrl("/providers/alibaba-cloud.md"))) {
+  errors.push("providers.md is missing the Alibaba Cloud Markdown page");
+}
+const modelsBody = hubPageMarkdown("models") ?? "";
+for (const model of models) {
+  if (!modelsBody.includes(absoluteUrl(modelMarkdownPath(model.slug)))) {
+    errors.push(`models.md is missing ${model.slug}`);
+  }
+}
+const faqBody = hubPageMarkdown("faq") ?? "";
+if (!faqBody.includes("## How are prices sourced?")) errors.push("faq.md is missing its questions");
+
+const indexBody = indexMarkdownDocument();
+if (!methodologyParagraphs.every((paragraph) => indexBody.includes(paragraph))) {
+  errors.push("index.md is missing the methodology");
+}
+const indexRows = markdownTableRows(indexBody);
+const homeOrder = modelsInHomeTableOrder(models);
+if (indexRows.length !== models.length) {
+  errors.push(`index.md table has ${indexRows.length} rows, expected ${models.length}`);
+} else {
+  for (let i = 0; i < homeOrder.length; i++) {
+    if (indexRows[i]?.[1] !== homeOrder[i]?.name) {
+      errors.push(`index.md sort diverges at row ${i}: ${indexRows[i]?.[1]} vs ${homeOrder[i]?.name}`);
+      break;
+    }
+  }
+}
+const qwenRow = indexRows.find((row) => row[1] === "Qwen3.8-Max");
+if (!qwenRow) {
+  errors.push("index.md table is missing Qwen3.8-Max");
+} else if (qwenRow.join(" | ") !== [
+  "Alibaba Cloud",
+  "Qwen3.8-Max",
+  "$2.00",
+  "$0.25",
+  "$6.00",
+  "Standard, International (Singapore) scope",
+  "1M",
+  "131,072",
+  "Active",
+  "n/a",
+  "https://www.alibabacloud.com/help/en/model-studio/model-pricing",
+].join(" | ")) {
+  errors.push(`index.md Qwen row mismatch: ${qwenRow.join(" | ")}`);
+}
+const rosalindRow = indexRows.find((row) => row[1] === "GPT-6 Rosalind");
+if (!rosalindRow?.includes("n/a")) errors.push("index.md should show n/a for GPT-6 Rosalind's unpublished limits");
+
+const changesBody = priceChangesMarkdownDocument();
+for (const needle of ["qwen3-8-max", "2026-12-01", "gemini-4-argon", "2027-01-01", "gemini-3-8-flash", "https://ai.google.dev/gemini-api/docs/pricing"]) {
+  if (!changesBody.includes(needle)) errors.push(`price-changes.md is missing ${needle}`);
+}
+const releasesBody = releasesMarkdownDocument();
+if (!releasesBody.includes("Alibaba Cloud — Qwen3.8-Max: n/a.")) {
+  errors.push("releases.md should show n/a for Qwen3.8-Max");
+}
+
+for (const pair of pairs) {
+  const path = `/compare/${pair.slug}.md`;
+  markdownPaths.add(path);
+  const body = comparePairMarkdownDocument(pair.slug);
+  if (!body) {
+    errors.push(`${path} document is missing`);
+    continue;
+  }
+  if (!body.includes(pair.a.name) || !body.includes(pair.b.name)) errors.push(`${path} is missing a model name`);
+  if (!body.includes(pair.a.sourceUrl) || !body.includes(pair.b.sourceUrl)) errors.push(`${path} is missing a source`);
+  if (!body.includes(`Checked: `)) errors.push(`${path} is missing Checked`);
+  const url = absoluteUrl(path);
+  if (!llms.includes(`Markdown: ${url}`)) errors.push(`llms.txt is missing ${url}`);
+  if (!llmsFull.includes(`Markdown: ${url}`)) errors.push(`llms-full.txt is missing ${url}`);
+}
+if (comparePairMarkdownDocument("not-a-pair") !== null) errors.push("Unknown comparison markdown must be null");
+
+const sampleMarkdown = markdownResponse("# Sample\n");
+if (sampleMarkdown.headers.get("Content-Type") !== "text/markdown; charset=utf-8") {
+  errors.push("Markdown responses must use Content-Type text/markdown; charset=utf-8");
+}
+if (sampleMarkdown.headers.get("Cache-Control") !== "public, max-age=3600") {
+  errors.push("Markdown responses must use the public one-hour cache header");
+}
+const missingMarkdown = markdownResponse(null);
+if (missingMarkdown.status !== 404) errors.push("Missing Markdown documents must return 404");
 
 console.log(`ModelMeter dataset check — ${models.length} rows, ledger date ${DATASET_CHECKED_ON}`);
 console.log(`Providers: ${providers().length}`);

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { markdownAlternatePath } from "@/lib/markdown-paths";
 import { siteConfig } from "@/lib/site";
 import { getSiteUrl } from "@/lib/site-url";
 
@@ -38,6 +39,7 @@ export function pageMetadata({
 }): Metadata {
   const canonical = absoluteUrl(path);
   const socialTitle = absoluteTitle ? title : `${title} · ${siteConfig.name}`;
+  const markdownUrl = markdownPath ?? markdownAlternatePath(path);
   return {
     title: absoluteTitle ? { absolute: title } : title,
     description,
@@ -47,8 +49,8 @@ export function pageMetadata({
         "text/plain": [{ url: "/llms.txt", title: "llms.txt" }],
         "application/json": [{ url: "/api/models.json", title: "Model dataset" }],
         "application/rss+xml": [{ url: "/price-changes.xml", title: "AI API price changes" }],
-        ...(markdownPath
-          ? { "text/markdown": [{ url: markdownPath, title: "Markdown" }] }
+        ...(markdownUrl
+          ? { "text/markdown": [{ url: markdownUrl, title: "Markdown" }] }
           : {}),
       },
     },

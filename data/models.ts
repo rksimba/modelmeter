@@ -6,7 +6,7 @@
  * on DATASET_CHECKED_ON. Do not fill gaps from memory or from other trackers.
  * If a provider has not published a value, leave it null.
  */
-export const DATASET_CHECKED_ON = "2026-11-01";
+export const DATASET_CHECKED_ON = "2026-11-02";
 
 export type ModelStatus = "active" | "preview" | "legacy" | "limited" | "deprecated";
 
@@ -813,5 +813,29 @@ export const models: Model[] = [
     priceLabel: "Cache miss / cache hit / output",
     notes:
       "The docs pricing table lists these rates: cache-miss input, cache-hit input, and output. Cache writes are billed separately at $2 per 1M tokens for a 5-minute TTL and $4 per 1M tokens for a 1-hour TTL. A Highspeed variant, kimi-k3.1-pro-highspeed, is $4 input, $0.20 cached input, and $20 output per 1M tokens. The quickstart sets max_completion_tokens to 131,072 by default and allows it up to 1,048,576, which is the max output recorded here. The docs pricing table renders client-side, and the stored rates are the ones on that table. Open weights are promised by 4 November 2026.",
+  },
+  {
+    slug: "qwen3-8-max",
+    provider: "Alibaba Cloud",
+    name: "Qwen3.8-Max",
+    apiId: "qwen3.8-max",
+    weightsFrom: "Alibaba (Qwen)",
+    inputUsdPerMillion: 2,
+    cachedInputUsdPerMillion: 0.25,
+    outputUsdPerMillion: 6,
+    contextTokens: 1_000_000,
+    maxOutputTokens: 131_072,
+    inputModalities: ["text", "image", "video"],
+    outputModalities: ["text"],
+    releaseDate: null,
+    releaseMonth: null,
+    status: "active",
+    sourceUrl: "https://www.alibabacloud.com/help/en/model-studio/model-pricing",
+    limitsSourceUrl: "https://docs.modelstudio.console.alibabacloud.com/en/model-studio/qwen3-8-max",
+    releaseSourceUrl: null,
+    updatedAt: checked,
+    priceLabel: "Standard, International (Singapore) scope",
+    notes:
+      "International (Singapore) scope rate for prompts up to 1M tokens, thinking and non-thinking modes. Global and China (Beijing) scope list $1.65 input, $0.206 implicit-cache input, and $4.951 output per 1M tokens. Explicit cache creation is $2.50 and explicit cache reads $0.17 per 1M tokens on the International scope. Batch is 50% of real-time where supported and does not stack with cache discounts. The pricing page lists standard prices only; console promotions are not included. Context window 1M and max output 131,072 tokens are from the qwen3.8-max model page.",
   },
 ];

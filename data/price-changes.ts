@@ -36,6 +36,21 @@ export type PriceChange = {
 
 export const priceChanges: PriceChange[] = [
   {
+    date: "2026-11-02",
+    modelSlug: "qwen3-8-max",
+    provider: "Alibaba Cloud",
+    kind: "new model",
+    oldRates: null,
+    newRates: {
+      inputUsdPerMillion: 2,
+      cachedInputUsdPerMillion: 0.25,
+      outputUsdPerMillion: 6,
+    },
+    sourceUrl: "https://www.alibabacloud.com/help/en/model-studio/model-pricing",
+    alsoSourceUrl: null,
+    note: "Alibaba Cloud lists Qwen3.8-Max (qwen3.8-max) at the International (Singapore) scope standard rate of $2 input, $0.25 implicit-cache input, and $6 output per 1M tokens for prompts up to 1M tokens; a release date is not published on the official page, and this row was added to the ledger on 2 November 2026.",
+  },
+  {
     date: "2026-11-01",
     modelSlug: "deepseek-v4-1-flash-1017",
     provider: "Mistral",

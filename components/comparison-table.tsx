@@ -10,19 +10,11 @@ import {
   formatRate,
   formatRelease,
   formatTokens,
-  releaseSortValue,
 } from "@/lib/format";
+import { compareLedgerModels, type LedgerSortKey } from "@/lib/model-sort";
 import { providerSlug } from "@/lib/models";
 
-type SortKey =
-  | "provider"
-  | "name"
-  | "input"
-  | "cached"
-  | "output"
-  | "context"
-  | "release"
-  | "updated";
+type SortKey = LedgerSortKey;
 
 const columns: { key: SortKey; label: string }[] = [
   { key: "name", label: "Model" },
@@ -34,27 +26,6 @@ const columns: { key: SortKey; label: string }[] = [
   { key: "release", label: "Released" },
   { key: "updated", label: "Updated" },
 ];
-
-function sortValue(model: Model, key: SortKey): string | number | null {
-  switch (key) {
-    case "provider":
-      return model.provider;
-    case "name":
-      return model.name;
-    case "input":
-      return model.inputUsdPerMillion;
-    case "cached":
-      return model.cachedInputUsdPerMillion;
-    case "output":
-      return model.outputUsdPerMillion;
-    case "context":
-      return model.contextTokens;
-    case "release":
-      return releaseSortValue(model);
-    case "updated":
-      return model.updatedAt;
-  }
-}
 
 export function ComparisonTable({ models }: { models: Model[] }) {
   const [query, setQuery] = useState("");
@@ -99,16 +70,7 @@ export function ComparisonTable({ models }: { models: Model[] }) {
       return haystack.includes(needle);
     });
 
-    const sign = direction === "asc" ? 1 : -1;
-    return filtered.sort((a, b) => {
-      const av = sortValue(a, sortKey);
-      const bv = sortValue(b, sortKey);
-      if (av === null && bv === null) return a.name.localeCompare(b.name);
-      if (av === null) return 1;
-      if (bv === null) return -1;
-      if (typeof av === "number" && typeof bv === "number") return (av - bv) * sign;
-      return String(av).localeCompare(String(bv)) * sign || a.name.localeCompare(b.name);
-    });
+    return filtered.sort((a, b) => compareLedgerModels(a, b, sortKey, direction));
   }, [models, query, provider, modality, sortKey, direction]);
 
   function toggleSort(key: SortKey) {
