@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { HUB_MARKDOWN_PAGES } from "./lib/markdown-paths";
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
@@ -17,6 +18,10 @@ const nextConfig: NextConfig = {
     // A ".md" suffix cannot be a dynamic segment next to the HTML page, so
     // these run before dynamic routes and keep /models/:slug and /providers/:slug.
     return [
+      ...HUB_MARKDOWN_PAGES.map((entry) => ({
+        source: entry.markdownPath,
+        destination: `/api/md/pages/${entry.page}`,
+      })),
       {
         source: "/models/:slug.md",
         destination: "/api/md/models/:slug",
@@ -24,6 +29,10 @@ const nextConfig: NextConfig = {
       {
         source: "/providers/:provider.md",
         destination: "/api/md/providers/:provider",
+      },
+      {
+        source: "/compare/:pair.md",
+        destination: "/api/md/compare/:pair",
       },
     ];
   },

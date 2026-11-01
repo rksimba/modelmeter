@@ -51,7 +51,7 @@ npm run build
 
 8. Commit the data change and push. Vercel rebuilds the static pages from the file.
 
-The calculator, provider pages, same-tier comparisons, cheapest and context rankings, `/sitemap.xml`, `/api/models.json`, `/llms.txt`, `/llms-full.txt`, and the per-model and per-provider Markdown pages all read `data/models.ts`. You do not update them separately. `/price-changes`, `/price-changes.xml`, and the price-change section of `/llms-full.txt` read `data/price-changes.ts`.
+The calculator, provider pages, same-tier comparisons, cheapest and context rankings, `/sitemap.xml`, `/api/models.json`, `/llms.txt`, `/llms-full.txt`, the per-model and per-provider Markdown pages, and the Markdown versions of the hub and list pages all read `data/models.ts`. You do not update them separately. `/price-changes`, `/price-changes.md`, `/price-changes.xml`, and the price-change section of `/llms-full.txt` read `data/price-changes.ts`.
 
 `sitemap.xml` sets `lastmod` from each row’s `updatedAt` on model pages, from the latest `updatedAt` among a provider’s rows on provider pages, from the later of the two rows on a comparison, and from `DATASET_CHECKED_ON` on the other pages. Set `NEXT_PUBLIC_SITE_URL` to the public origin (for example `https://modelmeter.live`) so canonical URLs, Open Graph URLs, the sitemap, and `llms.txt` use that host. Without it, a Vercel production build uses `VERCEL_PROJECT_PRODUCTION_URL`.
 
@@ -82,10 +82,11 @@ Prices are USD per 1 million tokens. The number is the specific rate named in `p
 | `/models/[slug]` | One model, its rate, limits, source, updated date, and related links |
 | `/models/[slug].md` | Plain Markdown for that model. Unknown slugs return 404. Not listed in the sitemap |
 | `/providers/[provider].md` | Plain Markdown for that provider. Unknown slugs return 404. Not listed in the sitemap |
+| `/index.md`, `/models.md`, `/providers.md`, `/price-changes.md`, `/releases.md`, `/faq.md`, `/cheapest-ai-api.md`, `/largest-context-window-ai-models.md`, `/compare.md`, `/compare/[pair].md` | Markdown for those HTML pages, generated from the ledger. Unknown comparison slugs return 404. Not listed in the sitemap |
 | `/about` | Methodology and a newsletter form |
 | `/sponsor` | Placeholder. No packages or terms |
 | `/api/models.json` | Full dataset. `/models.json` permanently redirects here (HTTP 308) |
-| `/llms.txt`, `/llms-full.txt` | Plain-text summary for chatbots, including the pages above. Model and provider entries also link to the `.md` pages |
+| `/llms.txt`, `/llms-full.txt` | Plain-text summary for chatbots, including the pages above. Model, provider, hub, and comparison entries also link to the `.md` pages |
 | `/sitemap.xml` | Those pages, with `lastmod` from the ledger dates |
 | `/api/subscribe` | Stores a newsletter contact in Resend. Sends no email. Returns 501 when `RESEND_API_KEY` or `RESEND_SEGMENT_ID` is missing. |
 

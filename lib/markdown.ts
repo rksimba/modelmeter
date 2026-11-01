@@ -4,9 +4,11 @@ import { absoluteUrl } from "@/lib/metadata";
 import { getModel, latestUpdate, modelsByProvider, providerFromSlug, providerSlug } from "@/lib/models";
 import { formatTokenRates, priceChangesNewestFirst } from "@/lib/price-changes";
 
+export { markdownAlternatePath } from "@/lib/markdown-paths";
+
 /** Shown in llms.txt, llms-full.txt, and the machine-readable FAQ answer. */
 export const markdownVersionsSentence =
-  "Every model page and every provider page has a Markdown version at the same path with .md appended.";
+  "Every model page and every provider page has a Markdown version at the same path with .md appended. Hub and list pages also have Markdown versions: /index.md for the home page, and /models.md, /providers.md, /price-changes.md, /releases.md, /faq.md, /cheapest-ai-api.md, /largest-context-window-ai-models.md, /compare.md, and each comparison page with .md appended.";
 
 export function modelMarkdownPath(slug: string): string {
   return `/models/${slug}.md`;
@@ -14,13 +16,6 @@ export function modelMarkdownPath(slug: string): string {
 
 export function providerMarkdownPath(slug: string): string {
   return `/providers/${slug}.md`;
-}
-
-/** Public Markdown path for a model or provider HTML page, or null for other paths. */
-export function markdownAlternatePath(htmlPath: string): string | null {
-  if (/^\/models\/[^/]+$/.test(htmlPath)) return `${htmlPath}.md`;
-  if (/^\/providers\/[^/]+$/.test(htmlPath)) return `${htmlPath}.md`;
-  return null;
 }
 
 const MARKDOWN_CACHE_CONTROL = "public, max-age=3600";
