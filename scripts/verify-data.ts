@@ -278,6 +278,13 @@ if (!kimi) {
   }
   if (/platform home/i.test(kimi.notes)) errors.push("kimi-k3-1-pro notes still cite the platform home");
   if (!kimi.notes.includes("docs pricing table")) errors.push("kimi-k3-1-pro notes must cite the docs pricing table");
+  if (/promised/i.test(kimi.notes)) errors.push("kimi-k3-1-pro notes still say open weights are only promised");
+  if (!kimi.notes.includes("https://huggingface.co/moonshotai/Kimi-K3.1-Pro")) {
+    errors.push("kimi-k3-1-pro notes must link the Hugging Face weights");
+  }
+  if (!kimi.notes.includes("separate from the API rates")) {
+    errors.push("kimi-k3-1-pro notes must keep the weight release separate from API pricing");
+  }
 }
 
 const qwen = models.find((model) => model.slug === "qwen3-8-max");

@@ -6,7 +6,7 @@
  * on DATASET_CHECKED_ON. Do not fill gaps from memory or from other trackers.
  * If a provider has not published a value, leave it null.
  */
-export const DATASET_CHECKED_ON = "2026-11-02";
+export const DATASET_CHECKED_ON = "2026-11-07";
 
 export type ModelStatus = "active" | "preview" | "legacy" | "limited" | "deprecated";
 
@@ -812,7 +812,7 @@ export const models: Model[] = [
     updatedAt: checked,
     priceLabel: "Cache miss / cache hit / output",
     notes:
-      "The docs pricing table lists these rates: cache-miss input, cache-hit input, and output. Cache writes are billed separately at $2 per 1M tokens for a 5-minute TTL and $4 per 1M tokens for a 1-hour TTL. A Highspeed variant, kimi-k3.1-pro-highspeed, is $4 input, $0.20 cached input, and $20 output per 1M tokens. The quickstart sets max_completion_tokens to 131,072 by default and allows it up to 1,048,576, which is the max output recorded here. The docs pricing table renders client-side, and the stored rates are the ones on that table. Open weights are promised by 4 November 2026.",
+      "The docs pricing table lists these rates: cache-miss input, cache-hit input, and output. Cache writes are billed separately at $2 per 1M tokens for a 5-minute TTL and $4 per 1M tokens for a 1-hour TTL. A Highspeed variant, kimi-k3.1-pro-highspeed, is $4 input, $0.20 cached input, and $20 output per 1M tokens. The quickstart sets max_completion_tokens to 131,072 by default and allows it up to 1,048,576, which is the max output recorded here. The docs pricing table renders client-side, and the stored rates are the ones on that table. Open weights are published by Moonshot AI at https://huggingface.co/moonshotai/Kimi-K3.1-Pro under the Kimi K3.1 Pro License. The model card lists a 2.8T-parameter mixture-of-experts model with 104B parameters active and a 1,048,576-token context. Hugging Face reports about 1.56 TB of files for that repository, which was created on 2 November 2026 and last updated on 5 November 2026. The weight release is separate from the API rates on the docs pricing table.",
   },
   {
     slug: "qwen3-8-max",
