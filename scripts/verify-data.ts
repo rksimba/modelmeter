@@ -278,6 +278,13 @@ if (!kimi) {
   }
   if (/platform home/i.test(kimi.notes)) errors.push("kimi-k3-1-pro notes still cite the platform home");
   if (!kimi.notes.includes("docs pricing table")) errors.push("kimi-k3-1-pro notes must cite the docs pricing table");
+  if (/promised/i.test(kimi.notes)) errors.push("kimi-k3-1-pro notes still say open weights are only promised");
+  if (!kimi.notes.includes("https://huggingface.co/moonshotai/Kimi-K3.1-Pro")) {
+    errors.push("kimi-k3-1-pro notes must link the Hugging Face weights");
+  }
+  if (!kimi.notes.includes("separate from the API rates")) {
+    errors.push("kimi-k3-1-pro notes must keep the weight release separate from API pricing");
+  }
 }
 
 const qwen = models.find((model) => model.slug === "qwen3-8-max");
@@ -318,6 +325,41 @@ if (!qwen) {
   } else if (added.provider !== "Alibaba Cloud") {
     errors.push("qwen3-8-max price change provider mismatch");
   }
+}
+
+const fable52 = models.find((model) => model.slug === "claude-fable-5-2");
+const fable51 = models.find((model) => model.slug === "claude-fable-5-1");
+if (!fable52) {
+  errors.push("Expected claude-fable-5-2 in the dataset");
+} else if (
+  fable52.inputUsdPerMillion !== 8 ||
+  fable52.cachedInputUsdPerMillion !== 0.2 ||
+  fable52.outputUsdPerMillion !== 40 ||
+  fable52.releaseDate !== "2026-11-09"
+) {
+  errors.push("claude-fable-5-2 stored rates or release date mismatch");
+}
+if (!fable51 || fable51.inputUsdPerMillion !== 10 || fable51.cachedInputUsdPerMillion !== 0.25 || fable51.outputUsdPerMillion !== 50) {
+  errors.push("claude-fable-5-1 stored rates changed");
+}
+const fableAdded = priceChanges.find(
+  (change) => change.modelSlug === "claude-fable-5-2" && change.date === "2026-11-17" && change.kind === "new model",
+);
+if (!fableAdded || fableAdded.newRates.inputUsdPerMillion !== 8 || fableAdded.newRates.outputUsdPerMillion !== 40) {
+  errors.push("claude-fable-5-2 is missing its 2026-11-17 new model price change");
+}
+
+const hydrogen = models.find((model) => model.slug === "gemini-4-hydrogen");
+if (!hydrogen || hydrogen.inputUsdPerMillion !== 1.5 || hydrogen.cachedInputUsdPerMillion !== 0.075 || hydrogen.outputUsdPerMillion !== 7.5) {
+  errors.push("gemini-4-hydrogen stored rates mismatch");
+}
+const ember = models.find((model) => model.slug === "muse-ember");
+if (!ember || ember.inputUsdPerMillion !== 0.1 || ember.cachedInputUsdPerMillion !== 0.004 || ember.outputUsdPerMillion !== 0.5) {
+  errors.push("muse-ember stored rates mismatch");
+}
+const small = models.find((model) => model.slug === "mistral-small-4");
+if (!small || small.cachedInputUsdPerMillion !== null || small.inputUsdPerMillion !== 0.15 || small.outputUsdPerMillion !== 0.6) {
+  errors.push("mistral-small-4 cached rate should be unpublished and the other rates unchanged");
 }
 
 const markdownPaths = new Set<string>();
